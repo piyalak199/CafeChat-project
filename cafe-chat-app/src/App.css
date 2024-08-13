@@ -1,0 +1,39 @@
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #fff;
+  margin: 0;
+}
+
+.sign-up-button {
+  display: flex;
+  align-items: center;
+  background-color: #000;
+  border: none;
+  border-radius: 25px;
+  padding: 0px 10px 0px 0px;
+  color: #ffffff;
+  font-family: Arial, sans-serif;
+  font-size: 16px;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.log-in-button {
+  background-color: #c05c56;
+  color: #fff;
+  border-style: solid;
+  border-color: #000000;
+  border-bottom-width: 10px;
+  border-radius: 20px;
+  padding: 20px 60px;
+  font-size: 20px;
+  cursor: pointer;
+
+}
+
+.log-in-button:focus {
+  outline: none;
+}
