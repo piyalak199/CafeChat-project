@@ -1,0 +1,129 @@
+.image-container { 
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0px 30px 0px;
+  background-color: #000000; /* Background color */
+  border-radius: 40px; /* Rounded corners */
+}
+
+.plus-button {
+  background-color: rgb(255, 0, 106); /* Red color */
+  color: #fff; /* White text color */
+  border-style: solid;
+  border-width: 4px;
+  border-radius: 50%;
+  border-color: rgb(0, 0, 0);
+  width: 30px;
+  cursor: pointer;
+  margin: 5px;
+  text-decoration: none;
+}
+
+.number {
+  font-size: 24px;
+  font-weight: bold;
+  color: #ffffff; /* Text color */
+  text-decoration: none;
+}
+
+.coin {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  margin-right: 10px;
+  background-color: #ffffff;
+}
+
+.button-cloth {
+  position: absolute;
+  top: 38%;
+  left: 58.5%;
+  transform: translate(-50%, -50%);
+  background-color: #c35650; /* The color of the button */
+  border-radius: 20px; /* Rounds the corners */
+  border: 1px solid #000000; /* Adds a black border */
+  padding: 5px 15px; /* Adds padding for height and width */
+  text-align: center; /* Centers the text */
+  color: white; /* Makes the text white */
+  font-size: 18px; /* Sets the font size */
+  font-family: "Arial", sans-serif; /* Sets the font family */
+  cursor: pointer; /* Changes the cursor to a pointer when hovered */
+  text-decoration: none; /* Removes any text decoration (e.g., underline) */
+}
+
+.button-shop {
+  position: absolute;
+  top: 38%;
+  left: 74.2%;
+  transform: translate(-50%, -50%);
+  background-color: #c35650;
+  border-radius: 20px;
+  border: 1px solid #000000;
+  padding: 5px 15px;
+  text-align: center;
+  color: white;
+  font-size: 18px;
+  font-family: "Arial", sans-serif;
+  cursor: pointer;
+  text-decoration: none;
+}
+.fram {
+  position: absolute;
+  top: 38%;
+  left: 74.2%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  width: 15%;
+  /* background-color: #ffffff; */
+}
+
+.button-pet {
+  position: absolute;
+  top: 74.6%;
+  left: 22.5%;
+  transform: translate(-50%, -50%);
+  background-color: #c35650;
+  border-radius: 20px;
+  border: 1px solid #000000;
+  padding: 10px 25px;
+  text-align: center;
+  color: white;
+  font-size: 18px;
+  font-family: "Arial", sans-serif;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.edit-displayName {
+  position: absolute;
+  top: 45%;
+  left: 22%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  font-size: 55px; /* Adjust the size of the icon */
+  color: #c35650; /* Adjust the color of the icon */
+}
+.displayName {
+  position: absolute;
+  top: 45%;
+  left: 28%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  font-size: 40px; 
+  color: #000000;
+}
+
+.button-play {
+  position: absolute;
+  top: 85%;
+  left: 49.5%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  font-size: 90px; 
+  color: #c35650; 
+  border-radius: 100%;
+  border: 1px solid #000000;
+}
+
+

@@ -1,0 +1,55 @@
+.login-button {
+  background-color: #c05c56; /* Red color */
+  color: #fff;
+  border: 1px solid #000000; /* Border matching the background color */
+  border-radius: 10px; /* Rounded corners */
+  padding: 10px 0;
+  font-size: 16px;
+  cursor: pointer;
+  width: 100%;
+  font-family: "Comic Sans MS", "Comic Sans", cursive; /* Matching font style */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  text-decoration: none;
+  padding: 8px 210px;
+  margin-top: 20px;
+  top: 50%;
+}
+
+.login-button:hover {
+  opacity: 0.8; /* Slightly dimmed on hover */
+}
+
+.login-button:focus {
+  outline: none; /* No outline on focus */
+}
+
+.signup-button {
+    background-color: #ffffff; /* Red color */
+    color: #000000;
+    border: 1px solid #000000; /* Border matching the background color */
+    border-radius: 10px; /* Rounded corners */
+    padding: 10px 0;
+    font-size: 16px;
+    cursor: pointer;
+    width: 100%;
+    font-family: "Comic Sans MS", "Comic Sans", cursive; /* Matching font style */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    text-decoration: none;
+    padding: 8px 210px;
+    margin-top: 20px;
+    top: 50%;
+  }
+  
+  .signup-button:hover {
+    opacity: 0.8; /* Slightly dimmed on hover */
+  }
+  
+  .signup-button:focus {
+    outline: none; /* No outline on focus */
+  }
