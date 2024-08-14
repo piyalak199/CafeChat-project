@@ -12,7 +12,6 @@ const express = require("express");
 const app = express();
 const port = 3001;
 
-
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
@@ -27,15 +26,28 @@ var pool = mysql.createPool({
   port: 8080,
 });
 
+const server = app.listen(port, () => {
+  console.log(`Server running at ${port}`);
+});
+
+const { Server } = require("socket.io");
+const io = new Server(server,{
+  cors: {
+    origin: "http://localhost:3000",
+    methods: ["GET", "POST"],
+  },
+});
+
+
 app.get("/", (req, res) => {
   res.send("Hello World by Express! all");
 });
 
-app.listen(port, () => {
-  console.log(`Server running at ${port}`);
+io.on("connection", (socket) => {
+  console.log("a user connected");
 });
 
-app.use('/img', express.static('img'));
+app.use("/img", express.static("img"));
 
 app.post("/login", (req, res) => {
   const username = req.body.username;
@@ -287,7 +299,7 @@ app.post("/api/Register/update", async (req, res) => {
       pool,
       input.userID,
       input.username,
-      input.password,
+      input.password
     );
 
     res.json({
@@ -315,66 +327,5 @@ app.post("/api/Register/delete", checkAuth, async (req, res) => {
       result: false,
       message: ex.message,
     });
-  }
-});
-
-app.get("/api/user", checkAuth, async (req, res) => {
-  const query = "SELECT * FROM user";
-
-  pool.query(query, (error, results) => {
-    if (error) {
-      res.json({
-        result: false,
-        message: error.message,
-      });
-    } else {
-      res.json({
-        result: true,
-        data: results,
-      });
-    }
-  });
-});
-
-app.get("/api/user/:userID", checkAuth, (req, res) => {
-  const userID = req.params.userID;
-  const sql =
-  "SELECT a.userID, a.username, a.displayName, a.coin ,a.petTypeID, p.petImg, r.roleID" +
-  "FROM user a " +
-  "INNER JOIN pettype p ON (a.petTypeID = p.petTypeID) " +
-  "INNER JOIN roles r ON (a.roleID = r.roleID) "
-
-  if (userID == 0) {
-    pool.query(sql, (error, results) => {
-      if (error) {
-        res.json({
-          result: false,
-          message: error.message,
-        });
-      } else {
-        res.json({
-          result: true,
-          data: results,
-        });
-      }
-    });
-  } else {
-    pool.query(
-      sql + "WHERE a.userID = ?",
-      [userID],
-      (error, results) => {
-        if (error) {
-          res.json({
-            result: false,
-            message: error.message,
-          });
-        } else {
-          res.json({
-            result: true,
-            data: results,
-          });
-        }
-      }
-    );
   }
 });

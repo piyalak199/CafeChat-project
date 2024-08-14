@@ -35,7 +35,7 @@ import { AuthProvider } from "./AuthContext";
 import Login from "./Login";
 import Signup from "./Signup";
 import Home from "./Home";
-// import RoomList from "./RoomList";
+import RoomPage from "./RoomPage";
 
 const router = createBrowserRouter([
   { path: "/", element: <App /> },
@@ -49,7 +49,7 @@ const router = createBrowserRouter([
       </AuthProvider>
     ),
   },
-  // { path: "/roomlist", element: <RoomList /> },
+  { path: "/roompage", element: <RoomPage /> },
 ]);
 
 const root = ReactDOM.createRoot(document.getElementById("root"));

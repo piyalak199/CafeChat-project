@@ -83,9 +83,9 @@ export default function Home(props) {
             </button>
             <div className="displayName">{displayName}</div>
 
-            <button class="button-play">
-              <Link to={"/roomlist"}>
-                <FaCirclePlay />
+            <button >
+              <Link to={"/roompage"}>
+                <FaCirclePlay class="button-play"/>
               </Link>
             </button>
             <img src={bgHomefull} class="mt-2 w-full" alt="bgHome" />
