@@ -16,33 +16,26 @@ import { AiFillEdit } from "react-icons/ai";
 import { FaCirclePlay } from "react-icons/fa6";
 
 import "./Home.css";
+import { useAuth } from "./AuthContext.js";
 
 export default function Home(props) {
   let params = useParams();
 
-  const [userID, setUserID] = useState(0);
-  const [username, setUsername] = useState("");
-  const [displayName, setDisplayName] = useState("");
-  const [coin, setCoin] = useState(0);
-  const [petImg, setPetImg] = useState("");
+  const {
+    accessToken,
+    userID,
+    username,
+    displayName,
+    coin,
+    pettypeID,
+    petName,
+    petImg,
+    roleID,
+    roleName,
+  } = useAuth();
 
-  useEffect(() => {
-    async function fetchData(userID) {
-      let json = await API_GET("user/" + userID);
-
-      var data = json.data[0];
-
-      setUserID(data.userID);
-      setUsername(data.username);
-      setDisplayName(data.displayName);
-      setCoin(data.coin);
-      setPetImg(data.petImg);
-    }
-    fetchData([params.userID]);
-  }, [params.userID]);
-
-  if (localStorage.getItem("access_token")) {
-    console.log(localStorage.getItem("access_token"));
+  if (accessToken) {
+    console.log("HomePage", accessToken);
 
     return (
       <>
@@ -78,18 +71,22 @@ export default function Home(props) {
             </div>
           </div>
           <div>
-            <div >
+            <div>
               <button class="button-cloth">แต่งตัว</button>
             </div>
 
             <button class="button-shop">ร้านค้า</button>
             <button class="button-pet">สัตว์เลี้ยง</button>
 
-            <button><AiFillEdit className="edit-displayName" /></button>
-            <div  className="displayName">{displayName}</div>
+            <button>
+              <AiFillEdit className="edit-displayName" />
+            </button>
+            <div className="displayName">{displayName}</div>
 
             <button class="button-play">
-              <FaCirclePlay />
+              <Link to={"/roomlist"}>
+                <FaCirclePlay />
+              </Link>
             </button>
             <img src={bgHomefull} class="mt-2 w-full" alt="bgHome" />
           </div>
