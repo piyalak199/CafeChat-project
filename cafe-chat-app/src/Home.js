@@ -34,23 +34,8 @@ export default function Home(props) {
     roleName,
   } = useAuth();
 
-  useEffect(() => {
-    async function fetchData(userID) {
-      let json = await API_GET("user/" + userID); 
-
-      var data = json.data[0];
-
-      setUserID(data.userID);
-      setUsername(data.username);
-      setDisplayName(data.displayName);
-      setCoin(data.coin);
-      setPetImg(data.petImg);
-    }
-    fetchData([params.userID]);
-  }, [params.userID]);
-
-  if (localStorage.getItem("access_token")) {
-    console.log(localStorage.getItem("access_token"));
+  if (accessToken) {
+    console.log("HomePage", accessToken);
 
     return (
       <>
