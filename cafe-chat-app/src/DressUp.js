@@ -49,9 +49,10 @@ export default function DressUp() {
           </div>
         </div>
         <div className="pet-section">
-          <img src={getdress} className="wordone" alt="Word1" />
+          <img src={getdress} className="getdress" alt="Word1" />
           <img src={seller} className="seller" alt="Pets" />
           <img src={framedress} className="framedress" alt="Word2" />
+          <img src={framedress} className="framedress2" alt="Word2" />
           <img src={navysuit} className="navysuit" alt="Word3" />
           <img src={bowsuit} className="bowsuit" alt="Word4" />
         </div>
