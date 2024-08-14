@@ -1,12 +1,14 @@
 import "bootstrap/dist/css/bootstrap.min.css";
 // import { useState } from "react";
 // import { Form, Row, Col, Button } from "react-bootstrap";
-import { Link } from "react-router-dom";
+import { Link, Route, Router, Routes } from "react-router-dom";
 
 import "./App.css";
 import bgLogin from "./img/bgLogin.png";
 import { MdAccountCircle } from "react-icons/md";
 import Header from "./components/Header";
+import PetSelect from "./PetSelect";
+import Home from "./Home";
 
 export default function App() {
   return (
@@ -30,6 +32,20 @@ export default function App() {
               <button class="log-in-button">ลงชื่อเข้าใช้</button>
             </Link>
           </div>
+          {/* <div className="flex justify-end mt-3">
+              <Link to="/homepage" className="text-decoration-none">
+                <button className="sign-up-button m-0" type="button">
+                  <MdAccountCircle size={50} />
+                  Homepage
+                </button>
+              </Link>
+            </div> */}
+
+         <Routes>
+          <Route path="/petselect" element={<PetSelect />} />
+          <Route path="/home" element={<Home />} />
+          {/* เพิ่ม Route อื่นๆ ที่คุณต้องการที่นี่ */}
+        </Routes>
         </div>
       </div>
       </div>

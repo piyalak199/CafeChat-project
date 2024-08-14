@@ -76,7 +76,10 @@ export default function Home(props) {
             </div>
 
             <button class="button-shop">ร้านค้า</button>
+
+            <Link to="/petselect">
             <button class="button-pet">สัตว์เลี้ยง</button>
+            </Link>
 
             <button>
               <AiFillEdit className="edit-displayName" />
