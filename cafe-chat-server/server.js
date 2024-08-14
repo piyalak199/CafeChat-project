@@ -339,7 +339,7 @@ app.get("/api/user", checkAuth, async (req, res) => {
 app.get("/api/user/:userID", checkAuth, (req, res) => {
   const userID = req.params.userID;
   const sql =
-  "SELECT a.userID, a.username, a.displayName, a.coin ,a.petTypeID, p.petName, p.petImg, r.roleID, r.roleName " +
+  "SELECT a.userID, a.username, a.displayName, a.coin ,a.petTypeID, p.petImg, r.roleID" +
   "FROM user a " +
   "INNER JOIN pettype p ON (a.petTypeID = p.petTypeID) " +
   "INNER JOIN roles r ON (a.roleID = r.roleID) "

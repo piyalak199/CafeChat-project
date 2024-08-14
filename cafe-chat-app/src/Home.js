@@ -16,15 +16,23 @@ import { AiFillEdit } from "react-icons/ai";
 import { FaCirclePlay } from "react-icons/fa6";
 
 import "./Home.css";
+import { useAuth } from "./AuthContext.js";
 
 export default function Home(props) {
   let params = useParams();
 
-  const [userID, setUserID] = useState(0);
-  const [username, setUsername] = useState("");
-  const [displayName, setDisplayName] = useState("");
-  const [coin, setCoin] = useState(0);
-  const [petImg, setPetImg] = useState("");
+  const {
+    accessToken,
+    userID,
+    username,
+    displayName,
+    coin,
+    pettypeID,
+    petName,
+    petImg,
+    roleID,
+    roleName,
+  } = useAuth();
 
   useEffect(() => {
     async function fetchData(userID) {
@@ -78,7 +86,7 @@ export default function Home(props) {
             </div>
           </div>
           <div>
-            <div >
+            <div>
               <button class="button-cloth">แต่งตัว</button>
             </div>
 
@@ -88,11 +96,15 @@ export default function Home(props) {
             <button class="button-pet">สัตว์เลี้ยง</button>
             </Link>
 
-            <button><AiFillEdit className="edit-displayName" /></button>
-            <div  className="displayName">{displayName}</div>
+            <button>
+              <AiFillEdit className="edit-displayName" />
+            </button>
+            <div className="displayName">{displayName}</div>
 
             <button class="button-play">
-              <FaCirclePlay />
+              <Link to={"/roomlist"}>
+                <FaCirclePlay />
+              </Link>
             </button>
             <img src={bgHomefull} class="mt-2 w-full" alt="bgHome" />
           </div>

@@ -31,6 +31,7 @@ import App from "./App";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
 // import TestState from "./TestState";
+import { AuthProvider } from "./AuthContext";
 import Login from "./Login";
 import Signup from "./Signup";
 import Home from "./Home";
@@ -50,7 +51,6 @@ root.render(
     <RouterProvider router={router} />
   </React.StrictMode>
 );
-
 
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))
