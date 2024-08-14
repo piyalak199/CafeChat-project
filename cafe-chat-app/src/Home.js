@@ -28,7 +28,7 @@ export default function Home(props) {
 
   useEffect(() => {
     async function fetchData(userID) {
-      let json = await API_GET("user/" + userID);
+      let json = await API_GET("user/" + userID); 
 
       var data = json.data[0];
 
@@ -83,7 +83,10 @@ export default function Home(props) {
             </div>
 
             <button class="button-shop">ร้านค้า</button>
+
+            <Link to="/petselect">
             <button class="button-pet">สัตว์เลี้ยง</button>
+            </Link>
 
             <button><AiFillEdit className="edit-displayName" /></button>
             <div  className="displayName">{displayName}</div>

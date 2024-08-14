@@ -34,12 +34,14 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Login from "./Login";
 import Signup from "./Signup";
 import Home from "./Home";
+import PetSelect from "./PetSelect";
 
 const router = createBrowserRouter([
   { path: "/", element: <App /> },
   { path: "/login", element: <Login /> },
   { path: "/signup", element: <Signup /> },
   { path: "/home", element: <Home /> },
+  { path: "/petselect", element: <PetSelect /> },
 ]);
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
