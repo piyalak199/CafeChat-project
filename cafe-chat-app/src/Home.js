@@ -72,7 +72,9 @@ export default function Home(props) {
           </div>
           <div>
             <div>
+              <Link to="/dressup">
               <button class="button-cloth">แต่งตัว</button>
+              </Link>
             </div>
 
             <button class="button-shop">ร้านค้า</button>
