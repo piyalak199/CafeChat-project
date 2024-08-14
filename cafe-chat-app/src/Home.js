@@ -35,7 +35,7 @@ export default function Home(props) {
   } = useAuth();
 
   if (accessToken) {
-    console.log("HomePage", accessToken);
+    console.log("PetSelect", accessToken);
 
     return (
       <>
