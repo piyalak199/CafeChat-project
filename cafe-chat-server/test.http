@@ -5,3 +5,7 @@
 #     "username": "piyalak",
 #     "password": "11111111"
 # }
+
+# GET http://localhost:3001/chatroom HTTP/1.1
+
+GET http://localhost:3001/chatroom/2

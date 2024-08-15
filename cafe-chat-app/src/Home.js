@@ -18,7 +18,7 @@ import { FaCirclePlay } from "react-icons/fa6";
 import "./Home.css";
 import { useAuth } from "./AuthContext.js";
 
-export default function Home(props) {
+export default function Home() {
   let params = useParams();
 
   const {
@@ -35,7 +35,7 @@ export default function Home(props) {
   } = useAuth();
 
   if (accessToken) {
-    console.log("PetSelect", accessToken);
+    console.log("homepage", accessToken);
 
     return (
       <>
@@ -78,7 +78,7 @@ export default function Home(props) {
             <button class="button-shop">ร้านค้า</button>
 
             <Link to="/petselect">
-            <button class="button-pet">สัตว์เลี้ยง</button>
+             <button class="button-pet">สัตว์เลี้ยง</button>
             </Link>
 
             <button>

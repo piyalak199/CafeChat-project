@@ -6,6 +6,7 @@ const path = require("path");
 const bodyParser = require("body-parser");
 
 const User = require("./libs/User");
+const ChatRoom = require("./libs/ChatRoom");
 
 const cors = require("cors");
 const express = require("express");
@@ -31,20 +32,32 @@ const server = app.listen(port, () => {
 });
 
 const { Server } = require("socket.io");
-const io = new Server(server,{
+const io = new Server(server, {
   cors: {
     origin: "http://localhost:3000",
     methods: ["GET", "POST"],
   },
 });
 
-
 app.get("/", (req, res) => {
   res.send("Hello World by Express! all");
 });
 
 io.on("connection", (socket) => {
-  console.log("a user connected");
+  console.log(`a user connected: ${socket.id}`);
+
+  socket.on("join_room", (data) => {
+    socket.join(data);
+    console.log("User join room:" + data);
+  });
+
+  socket.on("send_message", (data) => {
+    socket.to(data.room).emit("receive_message", data);
+  });
+
+  socket.on("disconnect", () => {
+    console.log("USER DISCONNECTED !");
+  });
 });
 
 app.use("/img", express.static("img"));
@@ -329,3 +342,23 @@ app.post("/api/Register/delete", checkAuth, async (req, res) => {
     });
   }
 });
+
+app.get("/chatroom/:chatroomID",checkAuth, async (req, res) => {
+  const roomID = req.params.chatroomID; // Corrected the parameter name
+  console.log(roomID);
+
+  try {
+    const result = await ChatRoom.getByRoomId(pool, roomID);
+
+    res.json({
+      result: true,
+      data: result,
+    });
+  } catch (ex) {
+    res.json({
+      result: false,
+      message: ex.message,
+    });
+  }
+});
+

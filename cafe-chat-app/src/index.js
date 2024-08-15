@@ -1,16 +1,17 @@
-// import React from 'react';
-// import ReactDOM from 'react-dom';
-// import './index.css';
-// import {
-//   BrowserRouter,
-//   Routes,
-//   Route,
-// } from "react-router-dom";
+// import React from "react";
+// import { ReactDOM } from "react-dom";
+// import "./index.css";
+// import reportWebVitals from './reprtWebVitals';
+// import { BrowserRouter, Routes, Route } from "react-router-dom";
+
 
 // import App from "./App";
-// import Login from "./Login";
 // import Home from "./Home";
 // import Signup from "./Signup";
+// import { AuthProvider } from "./AuthContext";
+// import Login from "./Login";
+// import RoomPage from "./RoomPage";
+// import PetSelect from "./PetSelect";
 
 // ReactDOM.render(
 //   <BrowserRouter>
@@ -21,6 +22,27 @@
 //         <Route path="/signup" element={<Signup />} />
 //       </Routes>
 //     </BrowserRouter>,
+//   document.getElementById('root')
+// );
+
+// ReactDOM.render(
+//   <BrowserRouter>
+//     <Routes>
+//       <Route path="/login" element={<Login />} />
+//       <Route path="/*" element={<App />} />
+//       <Route path="/signup" element={<Signup />} />
+//       <Route
+//         path="/home"
+//         element={
+//           <AuthProvider>
+//             <Home />
+//           </AuthProvider>
+//         }
+//       />
+//       <Route path="/roompage" element={<RoomPage />} />
+//       <Route path="/petselect" element={<PetSelect />} />
+//     </Routes>
+//   </BrowserRouter>,
 //   document.getElementById('root')
 // );
 

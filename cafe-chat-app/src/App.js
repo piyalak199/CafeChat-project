@@ -20,7 +20,7 @@ export default function App() {
             <Link to={"/signup"} class="text-decoration-none">
               <button class="sign-up-button m-0 " type="button">
                 <MdAccountCircle size={50} />
-                ลงทะเบียน test
+                ลงทะเบียน
               </button>
             </Link>
           </div>
