@@ -1,7 +1,6 @@
 import React, { useState, useEffect ,Component } from "react";
 import "./RoomPage.css";
 import io from "socket.io-client";
-import axios from "axios";
 
 const socket = io.connect("http://localhost:3001");
 
@@ -9,7 +8,7 @@ export default function RoomPage() {
   //room state
   const [room, setRoom] = useState("");
 
-  //message state
+  //message state 
   const [message, setMessage] = useState("");
   const [messageReceived, setMessageReceived] = useState("");
 
