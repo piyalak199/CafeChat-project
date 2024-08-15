@@ -1,10 +1,10 @@
 const mysql = require("mysql");
 
 module.exports = {
-    createUser: async (pool, username, password ) => {
-        var sql = "INSERT INTO user ( username, password ) "
-            + "VALUES (?, MD5(?)) ";
-            sql = mysql.format(sql, [ username, password ]);
+    createUser: async (pool, username, password, roleID ) => {
+        var sql = "INSERT INTO user ( username, password, roleID ) "
+            + "VALUES (?, MD5(?), ? ) ";
+            sql = mysql.format(sql, [ username, password, roleID ]);
 
             return await pool.query(sql);
     },

@@ -7,11 +7,11 @@ import x from "./img/x.png";
 import catL from "./img/catL.png";
 import FontSignup from "./img/FontSignup.png";
 import btSignup from "./img/btSignup.png";
-
-import { API_GET, API_POST } from "./api";
+import axios from 'axios'; // ใช้ Axios แทน fetch
 
 export default function Signup() {
   let params = useParams();
+  const navigate = useNavigate();
 
   const [userID, setUserID] = useState(0);
   const [username, setUsername] = useState("");
@@ -21,93 +21,99 @@ export default function Signup() {
   const [validated, setValidated] = useState(false);
 
   useEffect(() => {
-    async function fetchData(userID,) {
-      let json = await API_POST("Register/" + userID);
+    async function fetchData(userID) {
+      try {
+        let response = await axios.post(`http://localhost:3001/api/Register/${userID}`);
+        let data = response.data[0];
 
-      var data = json.data[0];
-
-      setUserID(data.userID);
-      setUsername(data.username);
-      setPassword(data.password);
-      setRole(data.roleID);
+        setUserID(data.userID);
+        setUsername(data.username);
+        setPassword(data.password);
+        setRole(data.roleID);
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+      }
     }
 
-    if (params.userID != "add") {
-      fetchData([params.userID]);
+    if (params.userID !== "add") {
+      fetchData(params.userID);
     }
   }, [params.userID]);
 
   const onSave = (event) => {
     const form = event.currentTarget;
     event.preventDefault();
+    setValidated(true);
 
     if (form.checkValidity() === false) {
       event.stopPropagation();
-    } else if (params.userID == "add") {
+    } else {
+      if (password !== confirmPassword) {
+        alert("Passwords do not match");
+        return;
+      }
+
       createUser();
     }
-
-    setValidated(true);
   };
 
   const createUser = async () => {
-    const response = await fetch("http://localhost:3001/api/Register/add", {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-        Authorization: "Bearer " + localStorage.getItem("access_token"),
-      },
-      body: JSON.stringify({
+    try {
+      const response = await axios.post("http://localhost:3001/api/Register/add", {
         username: username,
         password: password,
         roleID: role,
-      }),
-    });
-    let json = await response.json();
-    if (json.result) {
-      window.location = "/";
+      }, {
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + localStorage.getItem("access_token"),
+        },
+      });
+
+      if (response.data.result) {
+        navigate("/");
+      }
+    } catch (error) {
+      console.error("Error creating user:", error);
     }
   };
 
   return (
     <div className="Signup">
-      <div class="container absolute inset-x-0 top-0">
-        <header class="bg-black p-4"></header>
-        <div class="flex justify-start">
+      <div className="container absolute inset-x-0 top-0">
+        <header className="bg-black p-4"></header>
+        <div className="flex justify-start">
           <Link to={"/"}>
-            <img src={Homeicon} class="mt-2 " alt="Homeiocn" />
+            <img src={Homeicon} className="mt-2 " alt="Homeicon" />
           </Link>
         </div>
-        <div class="grid grid-flow-row auto-rows-max">
-          <div class="flex justify-center">
-            <Form>
-              <div class="box-border h-[32rem] p-2 border-2 border-black rounded-3xl min-w-[450px]">
-                <p class="flex justify-end m-0">
+        <div className="grid grid-flow-row auto-rows-max">
+          <div className="flex justify-center">
+            <Form noValidate validated={validated} onSubmit={onSave}>
+              <div className="box-border h-[32rem] p-2 border-2 border-black rounded-3xl min-w-[450px]">
+                <p className="flex justify-end m-0">
                   <Link to={"/"}>
-                    <img src={x} class="max-w-10" alt="x" />
+                    <img src={x} className="max-w-10" alt="x" />
                   </Link>
                 </p>
-                <p class="flex justify-center m-0 grid grid-flow-row auto-rows-max">
-                  <img src={catL} class="max-w-60" alt="catL" />
-                  <p class="flex justify-center">
-                    <img src={FontSignup} class="max-w-20" alt="FontSignup" />
+                <p className="flex justify-center m-0 grid grid-flow-row auto-rows-max">
+                  <img src={catL} className="max-w-60" alt="catL" />
+                  <p className="flex justify-center">
+                    <img src={FontSignup} className="max-w-20" alt="FontSignup" />
                   </p>
                 </p>
 
-                 {/* form */}
                 <Form.Group as={Col} controlId="validateUsername">
                   <Form.Label>Username</Form.Label>
                   <Form.Control
                     required
                     type="text"
                     placeholder="Username"
+                    value={username}
                     onChange={(e) => setUsername(e.target.value)}
                   />
-                  <Form.Control.Feedback
-                    style={{ margin: "-22px 0 0 65px" }}
-                    type="invalid"
-                  >
+                  <Form.Control.Feedback type="invalid">
                     กรุณากรอก Username
                   </Form.Control.Feedback>
                 </Form.Group>
@@ -118,12 +124,10 @@ export default function Signup() {
                     required
                     type="password"
                     placeholder="Password"
+                    value={password}
                     onChange={(e) => setPassword(e.target.value)}
                   />
-                  <Form.Control.Feedback
-                    style={{ margin: "0px 0 0px -350px" }}
-                    type="invalid"
-                  >
+                  <Form.Control.Feedback type="invalid">
                     กรุณากรอก Password
                   </Form.Control.Feedback>
                 </Form.Group>
@@ -132,14 +136,12 @@ export default function Signup() {
                   <Form.Label>Confirm Password</Form.Label>
                   <Form.Control
                     required
-                    type="Confirm Password"
+                    type="password"
                     placeholder="Confirm Password"
+                    value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                   />
-                  <Form.Control.Feedback
-                    style={{ margin: "0px 0 0px -350px" }}
-                    type="invalid"
-                  >
+                  <Form.Control.Feedback type="invalid">
                     กรุณายืนยัน Password
                   </Form.Control.Feedback>
                 </Form.Group>
@@ -147,16 +149,12 @@ export default function Signup() {
                 <Row className="mb-3">
                   <Button
                     variant="primary"
-                    as="input"
                     type="submit"
                     value="SAVE"
-                  />
+                  >
+                    SAVE
+                  </Button>
                 </Row>
-                {/* <Link to={`/`}>
-                  <p class="flex justify-center mt-10">
-                    <img src={btSignup} class="max-w-96" alt="btSignup" />
-                  </p>
-                </Link> */}
               </div>
             </Form>
           </div>

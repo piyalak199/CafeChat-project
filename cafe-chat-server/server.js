@@ -304,44 +304,6 @@ app.get("/api/Register/:userID", async (req, res) => {
   }
 });
 
-app.post("/api/Register/update", async (req, res) => {
-  const input = req.body;
-
-  try {
-    var result = await User.updateUser(
-      pool,
-      input.userID,
-      input.username,
-      input.password
-    );
-
-    res.json({
-      result: true,
-    });
-  } catch (ex) {
-    res.json({
-      result: false,
-      message: ex.message,
-    });
-  }
-});
-
-app.post("/api/Register/delete", checkAuth, async (req, res) => {
-  const input = req.body;
-
-  try {
-    var result = await User.deleteUser(pool, input.userID);
-
-    res.json({
-      result: true,
-    });
-  } catch (ex) {
-    res.json({
-      result: false,
-      message: ex.message,
-    });
-  }
-});
 
 app.get("/chatroom/:chatroomID",checkAuth, async (req, res) => {
   const roomID = req.params.chatroomID; // Corrected the parameter name
