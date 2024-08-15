@@ -1,56 +1,75 @@
-body {
-  margin: 0;
-  padding-bottom: 3rem;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
-    Arial, sans-serif;
+/* เพิ่มสไตล์ให้กับ header */
+header {
+  background-color: #000;
+  color: #000000;
+  padding: 16px;
+  text-align: center;
+  font-size: 1.5rem;
 }
 
-.form {
-  background: rgba(0, 0, 0, 0.15);
-  padding: 0.25rem;
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  display: flex;
-  height: 3rem;
-  box-sizing: border-box;
-  backdrop-filter: blur(10px);
-  
+/* ปรับให้ Userlist ดูโดดเด่น */
+.box-border {
+  border: 2px solid #000;
+  border-radius: 10px;
+  background-color: #f9f9f9;
 }
 
-.input {
-  border: none;
-  padding: 0 1rem;
-  flex-grow: 1;
-  border-radius: 2rem;
-  margin: 0.25rem;
+/* ปรับปรุงพื้นที่ในการกรอกข้อมูลและปุ่ม Join */
+input.input {
+  width: calc(100% - 60px);
+  padding: 10px;
+  margin-right: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
 }
 
-.input:focus {
-  outline: none;
-}
-
-.form > button {
-  background: #333;
-  border: none;
-  padding: 0 1rem;
-  margin: 0.25rem;
-  border-radius: 3px;
-  outline: none;
+button {
+  background-color: #007bff;
   color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.3s ease;
 }
 
-.messages {
-  list-style-type: none;
-  margin: 0;
-  padding: 0;
+button:hover {
+  background-color: #0056b3;
 }
 
-.messages > li {
-  padding: 0.5rem 1rem;
+/* ปรับปรุงกล่องข้อความ */
+.form {
+  display: flex;
+  align-items: center;
+  margin-top: 10px;
 }
 
-.messages > li:nth-child(odd) {
-  background: #efefef;
+input.input {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  margin-right: 10px;
+  width: 100%;
+  position: relative;
+}
+
+.box-border {
+  background-color: #f4f4f4;
+  padding: 20px;
+}
+
+/* สไตล์สำหรับพื้นที่แชท */
+.grid {
+  display: grid;
+  gap: 10px;
+}
+
+/* ปรับพื้นที่ที่จัดแสดงข้อความ */
+.message-container {
+  padding: 20px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 10px;
 }

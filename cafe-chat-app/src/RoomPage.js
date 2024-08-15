@@ -1,4 +1,4 @@
-import React, { useState, useEffect ,Component } from "react";
+import React, { useState, useEffect, Component } from "react";
 import "./RoomPage.css";
 import io from "socket.io-client";
 
@@ -8,7 +8,7 @@ export default function RoomPage() {
   //room state
   const [room, setRoom] = useState("");
 
-  //message state 
+  //message state
   const [message, setMessage] = useState("");
   const [messageReceived, setMessageReceived] = useState("");
 
@@ -34,35 +34,33 @@ export default function RoomPage() {
     return (
       <div>
         <div class="container absolute inset-x-0 top-0">
-          <header class="bg-black p-4"></header>
+          <header>Chat Application</header>
 
-          <div class=" flex justify-center items-center">
+          <div class="flex justify-center items-center">
             <div class="box-border h-32 w-3/4 border-b border-black flex justify-center items-center">
               <div>Userlist in chatroom</div>
             </div>
           </div>
 
-          <div class="grid grid-cols-5 gap-2 self-center mt-10 h-[32rem] ">
-            <div class="flex justify-center ">
+          <div class="grid grid-cols-5 gap-2 self-center mt-10 h-[32rem]">
+            <div class="flex justify-center">
               <div class="items-center box-border h-full w-full mx-16 p-3 border border-black rounded-3xl">
                 <div class="grid grid-flow-row auto-rows-max">
                   <div>
                     <input
                       className="input"
-                      onChange={(event) => {
-                        setRoom(event.target.value);
-                      }}
+                      onChange={(event) => setRoom(event.target.value)}
                     />
                     <button onClick={joinRoom}>Join</button>
                   </div>
                 </div>
               </div>
             </div>
-            <div class="col-span-4 flex justify-center ">
-              <div class="box-border h-full w-full mr-16 p-4 border border-black rounded-3xl">
+            <div class="col-span-4 flex justify-center">
+              <div class="box-border h-full w-full mr-16 p-4 border border-black rounded-3xl message-container">
                 <div>
                   <div>
-                    <div>message: </div>
+                    <div>Message: </div>
                     {messageReceived}
                   </div>
 
@@ -70,9 +68,7 @@ export default function RoomPage() {
                     <input
                       placeholder="พูดคุยกับเพื่อนๆสิ..."
                       className="input"
-                      onChange={(event) => {
-                        setMessage(event.target.value);
-                      }}
+                      onChange={(event) => setMessage(event.target.value)}
                     />
                     <button onClick={sendMessage}>Send</button>
                   </form>
