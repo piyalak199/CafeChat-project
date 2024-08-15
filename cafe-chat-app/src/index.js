@@ -59,11 +59,13 @@ import Signup from "./Signup";
 import Home from "./Home";
 import RoomPage from "./RoomPage";
 import PetSelect from "./PetSelect";
+import DressUp from "./DressUp";
 
 const router = createBrowserRouter([
   { path: "/", element: <App /> },
   { path: "/login", element: <Login /> },
   { path: "/signup", element: <Signup /> },
+  { path: "/dressup", element: <DressUp />},
   {
     path: "/home",
     element: (

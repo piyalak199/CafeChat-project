@@ -9,6 +9,7 @@ import { MdAccountCircle } from "react-icons/md";
 import Header from "./components/Header";
 import PetSelect from "./PetSelect";
 import Home from "./Home";
+import DressUp from "./DressUp";
 
 export default function App() {
   return (
@@ -44,6 +45,7 @@ export default function App() {
          <Routes>
           <Route path="/petselect" element={<PetSelect />} />
           <Route path="/home" element={<Home />} />
+          <Route path="/dressup" element={<DressUp />} />
           {/* เพิ่ม Route อื่นๆ ที่คุณต้องการที่นี่ */}
         </Routes>
         </div>
