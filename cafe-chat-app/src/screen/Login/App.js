@@ -4,13 +4,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { Link, Route, Router, Routes } from "react-router-dom";
 
 import "./App.css";
-import bgLogin from "./img/bgLogin.png";
 import { MdAccountCircle } from "react-icons/md";
-import Header from "./components/Header";
-import PetSelect from "./PetSelect";
-import Home from "./Home";
-import DressUp from "./DressUp";
-
 export default function App() {
   return (
     <div className="App">
@@ -26,7 +20,7 @@ export default function App() {
             </Link>
           </div>
           <div class="flex justify-center">
-            <img src={bgLogin} class=" size-fit m-10" alt="bgLogin" />
+            <img src={"img\Login\bgLogin.png"} class=" size-fit m-10" alt="bgLogin" />
           </div>
           <div class="flex justify-center ">
             <Link to={"/login"}>
@@ -42,12 +36,7 @@ export default function App() {
               </Link>
             </div> */}
 
-         <Routes>
-          <Route path="/petselect" element={<PetSelect />} />
-          <Route path="/home" element={<Home />} />
-          <Route path="/dressup" element={<DressUp />} />
-          {/* เพิ่ม Route อื่นๆ ที่คุณต้องการที่นี่ */}
-        </Routes>
+         
         </div>
       </div>
       </div>

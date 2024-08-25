@@ -6,57 +6,7 @@ import axios from "axios";
 const socket = io.connect("http://localhost:3001");
 
 export default function RoomPage() {
-  const [room, setRoom] = useState("");
-  const [messages, setMessages] = useState([]);
-  const [message, setMessage] = useState("");
-
-  const joinRoom = async () => {
-    if (room !== "") {
-      socket.emit("join_room", room);
-      await loadPreviousMessages(room); // Load previous messages when joining the room
-    }
-  };
-
-  const loadPreviousMessages = async (room) => {
-    try {
-      const token = localStorage.getItem("access_token");
-      const response = await axios.get(`http://localhost:3001/chatroom/${room}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (response.data.result) {
-        setMessages(response.data.data); // Set previous messages
-      }
-    } catch (error) {
-      console.error("Error loading messages:", error);
-    }
-  };
-
-  const sendMessage = async (e) => {
-    e.preventDefault(); // Prevent form submission
-    if (message !== "" && room !== "") {
-      const newMessage = { message, room };
-
-      try {
-        await axios.post("http://localhost:3001/send_message", newMessage);
-
-        setMessages((prevMessages) => [...prevMessages, newMessage]);
-        setMessage(""); // Clear input field after sending
-      } catch (error) {
-        console.error("Error sending message:", error);
-      }
-    }
-  };
-
-  useEffect(() => {
-    socket.on("receive_message", (data) => {
-      setMessages((prevMessages) => [...prevMessages, data]);
-    });
-  
-    return () => {
-      socket.off("receive_message");
-    };
-  }, []);
-  
+  // const []
 
   if (localStorage.getItem("access_token")) {
     return (
@@ -79,7 +29,7 @@ export default function RoomPage() {
                       className="input"
                       onChange={(event) => setRoom(event.target.value)}
                     />
-                    <button onClick={joinRoom}>Join</button>
+                    <button onClick={a}>Join</button>
                   </div>
                 </div>
               </div>
@@ -90,7 +40,7 @@ export default function RoomPage() {
                   {messages.map((msg, index) => (
                     <div key={index}>Message: {msg.message}</div>
                   ))}
-                  <form className="form" onSubmit={sendMessage}>
+                  <form className="form" onSubmit={a}>
                     <input
                       placeholder="พูดคุยกับเพื่อนๆสิ..."
                       className="input"

@@ -4,7 +4,6 @@
 // import reportWebVitals from './reprtWebVitals';
 // import { BrowserRouter, Routes, Route } from "react-router-dom";
 
-
 // import App from "./App";
 // import Home from "./Home";
 // import Signup from "./Signup";
@@ -49,31 +48,23 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import "./index.css";
-import App from "./App";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
 // import TestState from "./TestState";
-import { AuthProvider } from "./AuthContext";
-import Login from "./Login";
-import Signup from "./Signup";
-import Home from "./Home";
-import RoomPage from "./RoomPage";
-import PetSelect from "./PetSelect";
-import DressUp from "./DressUp";
+import Login from "./screen/Login/Login";
+import Signup from "./screen/Login/Signup";
+import DressUp from "./screen/Home/DressUp";
+import Home from "./screen/Home/Home.js";
+import RoomPage from "./screen/Home/RoomPage";
+import PetSelect from "./screen/Home/PetSelect";
+import App from "./screen/Login/App";
 
 const router = createBrowserRouter([
   { path: "/", element: <App /> },
   { path: "/login", element: <Login /> },
   { path: "/signup", element: <Signup /> },
-  { path: "/dressup", element: <DressUp />},
-  {
-    path: "/home",
-    element: (
-      <AuthProvider>
-        <Home />
-      </AuthProvider>
-    ),
-  },
+  { path: "/dressup", element: <DressUp /> },
+  { path: "/home", element: <Home /> },
   { path: "/roompage", element: <RoomPage /> },
   { path: "/petselect", element: <PetSelect /> },
 ]);

@@ -43,63 +43,9 @@ app.get("/", (req, res) => {
   res.send("Hello World by Express! all");
 });
 
-app.post("/send_message", async (req, res) => {
-  const { message, room } = req.body;
-
-  try {
-    // Save the message to the database
-    await ChatRoom.saveMessage(pool, room, message);
-
-    // Emit the message to other users in the room
-    io.to(room).emit("receive_message", { message });
-
-    res.json({ result: true });
-  } catch (ex) {
-    res.json({ result: false, message: ex.message });
-  }
-});
-
-// io.on("connection", (socket) => {
-//   console.log(`a user connected: ${socket.id}`);
-
-//   socket.on("join_room", (data) => {
-//     socket.join(data);
-//     console.log("User join room:" + data);
-//   });
-
-//   socket.on("send_message", (data) => {
-//     socket.to(data.room).emit("receive_message", data);
-//   });
-
-//   socket.on("disconnect", () => {
-//     console.log("USER DISCONNECTED !");
-//   });
-// });
-
-io.on("connection", (socket) => {
-  console.log(`A user connected: ${socket.id}`);
-
-  socket.on("join_room", (room) => {
-    socket.join(room);
-    console.log(`User joined room: ${room}`);
-  });
-
-  socket.on("send_message", (data) => {
-    const { room, message } = data;
-
-    // Emit the message to all clients in the room except the sender
-    socket.to(room).emit("receive_message", data);
-
-    // Optionally, save the message to the database
-    ChatRoom.saveMessage(pool, room, message).catch(console.error);
-  });
-
-  socket.on("disconnect", () => {
-    console.log("User disconnected!");
-  });
-});
-
 app.use("/img", express.static("img"));
+
+
 
 app.post("/login", (req, res) => {
   const username = req.body.username;
@@ -334,46 +280,6 @@ app.get("/api/Register/:userID", async (req, res) => {
     res.json({
       result: true,
       data: result,
-    });
-  } catch (ex) {
-    res.json({
-      result: false,
-      message: ex.message,
-    });
-  }
-});
-
-
-// app.get("/chatroom/:chatroomID",checkAuth, async (req, res) => {
-//   const roomID = req.params.chatroomID; // Corrected the parameter name
-//   console.log(roomID);
-
-//   try {
-//     const result = await ChatRoom.getByRoomId(pool, roomID);
-
-//     res.json({
-//       result: true,
-//       data: result,
-//     });
-//   } catch (ex) {
-//     res.json({
-//       result: false,
-//       message: ex.message,
-//     });
-//   }
-// });
-
-
-app.get("/chatroom/:chatroomID", checkAuth, async (req, res) => {
-  const roomID = req.params.chatroomID;
-
-  try {
-    // Fetch all messages for the room from the database
-    const result = await ChatRoom.getMessagesByRoomId(pool, roomID);
-
-    res.json({
-      result: true,
-      data: result, // Assuming result is an array of messages
     });
   } catch (ex) {
     res.json({

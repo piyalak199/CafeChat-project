@@ -1,15 +1,8 @@
 import "bootstrap/dist/css/bootstrap.min.css";
 import React from "react";
 import { Link } from "react-router-dom";
-import Homeicon from "./img/homeicon.png";
-import getdress from "./img/getdress.PNG";
-import framedress from "./img/framedress.PNG";
-import seller from "./img/seller.PNG";
-import Coin from "./img/coin.png";
 import { CgProfile } from "react-icons/cg";
 import { IoIosNotifications } from "react-icons/io";
-import navysuit from "./img/navysuit.PNG";
-import bowsuit from "./img/bowsuit.PNG";
 
 import "./DressUp.css";
 
@@ -23,7 +16,7 @@ export default function DressUp() {
         <div class="grid grid-cols-10 gap-4 self-center h-10 ">
           <div class="col-start-0 self-center">
             <Link to={"/home"}>
-              <img src={Homeicon} class="m-0 min-w-full" alt="Homeicon" />
+              <img src={"img/homeicon.png"} class="m-0 min-w-full" alt="Homeicon" />
             </Link>
           </div>
           <div class="col-start-0 col-end-9 col-span-2 self-center">
@@ -33,7 +26,7 @@ export default function DressUp() {
                   <button className="plus-button ">+</button>
                 </div>
                 <div className="number">{coin}</div>
-                <img src={Coin} className=" coin" alt="Coin" />
+                <img src={"img/coin.png"} className=" coin" alt="Coin" />
               </div>
             </Link>
           </div>
@@ -49,12 +42,12 @@ export default function DressUp() {
           </div>
         </div>
         <div className="pet-section">
-          <img src={getdress} className="getdress" alt="Word1" />
-          <img src={seller} className="seller" alt="Pets" />
-          <img src={framedress} className="framedress" alt="Word2" />
-          <img src={framedress} className="framedress2" alt="Word2" />
-          <img src={navysuit} className="navysuit" alt="Word3" />
-          <img src={bowsuit} className="bowsuit" alt="Word4" />
+          <img src={"img/getdress.png"} className="getdress" alt="Word1" />
+          <img src={"img/seller.png"} className="seller" alt="Pets" />
+          <img src={"img/framedress.png"} className="framedress" alt="Word2" />
+          <img src={"img/framedress.png"} className="framedress2" alt="Word2" />
+          <img src={"img/navysuit.png"} className="navysuit" alt="Word3" />
+          <img src={"img/bowsuit.png"} className="bowsuit" alt="Word4" />
         </div>
       </div>
     </>

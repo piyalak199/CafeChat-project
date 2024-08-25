@@ -2,11 +2,6 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { useState, useEffect } from "react";
 import { Form, Row, Col, Button } from "react-bootstrap";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import Homeicon from "./img/homeicon.png";
-import x from "./img/x.png";
-import catL from "./img/catL.png";
-import FontSignup from "./img/FontSignup.png";
-import btSignup from "./img/btSignup.png";
 import axios from 'axios'; // ใช้ Axios แทน fetch
 
 export default function Signup() {
@@ -85,7 +80,7 @@ export default function Signup() {
         <header className="bg-black p-4"></header>
         <div className="flex justify-start">
           <Link to={"/"}>
-            <img src={Homeicon} className="mt-2 " alt="Homeicon" />
+            <img src={"./img/homeicon.png"} className="mt-2 " alt="Homeicon" />
           </Link>
         </div>
         <div className="grid grid-flow-row auto-rows-max">
@@ -94,13 +89,13 @@ export default function Signup() {
               <div className="box-border h-[32rem] p-2 border-2 border-black rounded-3xl min-w-[450px]">
                 <p className="flex justify-end m-0">
                   <Link to={"/"}>
-                    <img src={x} className="max-w-10" alt="x" />
+                    <img src={"./img/x.png"} className="max-w-10" alt="x" />
                   </Link>
                 </p>
                 <p className="flex justify-center m-0 grid grid-flow-row auto-rows-max">
-                  <img src={catL} className="max-w-60" alt="catL" />
+                  <img src={"./img/catL.png"} className="max-w-60" alt="catL" />
                   <p className="flex justify-center">
-                    <img src={FontSignup} className="max-w-20" alt="FontSignup" />
+                    Signup
                   </p>
                 </p>
 
