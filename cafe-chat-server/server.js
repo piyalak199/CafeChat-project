@@ -22,9 +22,9 @@ var pool = mysql.createPool({
   connectionLimit: 10,
   host: "localhost",
   user: "root",
-  password: "",
+  password: "root",
   database: "cafechat",
-  port: 8080,
+  port: 3306,
 });
 
 const server = app.listen(port, () => {
