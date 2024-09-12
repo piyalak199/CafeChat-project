@@ -22,7 +22,7 @@ var pool = mysql.createPool({
   connectionLimit: 10,
   host: "localhost",
   user: "root",
-  password: "root",
+  password: "",
   database: "cafechat",
   port: 3306,
 });
@@ -38,13 +38,59 @@ const io = new Server(server, {
     methods: ["GET", "POST"],
   },
 });
+// Socket.IO event handling
+io.on('connection', (socket) => {
+  console.log('A user connected:', socket.id);
+
+  // Join a specific chat room
+  socket.on('joinRoom', (roomID) => {
+    socket.join(roomID);
+    console.log(`User ${socket.id} joined room ${roomID}`);
+  });
+
+  // Leave a specific chat room
+  socket.on('leaveRoom', (roomID) => {
+    socket.leave(roomID);
+    console.log(`User ${socket.id} left room ${roomID}`);
+  });
+
+  // Handle sending messages to a specific room
+  socket.on('sendMessage', (message) => {
+    const { room, text } = message;
+    if (room) {
+      io.to(room).emit('message', { text });
+      console.log(`Message sent to room ${room}: ${text}`);
+    }
+  });
+
+  socket.on('disconnect', () => {
+    console.log('A user disconnected:', socket.id);
+  });
+});
+
+
+// Fetch chat rooms
+app.get("/chatrooms", (req, res) => {
+  pool.query("SELECT * FROM chatroom", (error, results) => {
+    if (error) throw error;
+    res.json(results);
+  });
+});
+
+// Fetch specific chat room
+app.get("/chatrooms/:id", (req, res) => {
+  const roomID = req.params.id;
+  pool.query("SELECT * FROM chatroom WHERE roomID = ?", [roomID], (error, results) => {
+    if (error) throw error;
+    res.json(results[0]);
+  });
+});
 
 app.get("/", (req, res) => {
   res.send("Hello World by Express! all");
 });
 
 app.use("/img", express.static("img"));
-
 
 
 app.post("/login", (req, res) => {
@@ -286,5 +332,23 @@ app.get("/api/Register/:userID", async (req, res) => {
       result: false,
       message: ex.message,
     });
+  }
+});
+
+app.get("/chatroom/:chatroomId", async (req, res) => {
+  const chatroomId = req.params.chatroomId;
+
+  try {
+      var results = await ChatRoom.getByRoomID[pool, chatroomId];
+
+      res.json({
+          result: true,
+          data: results
+      });
+  } catch (ex) {
+      res.json({
+          result: false,
+          message: ex.message
+      });
   }
 });

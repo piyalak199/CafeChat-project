@@ -1,4 +1,4 @@
-class User {
+class Users {
     constructor({
       userId,
       username,
@@ -22,7 +22,7 @@ class User {
     }
   
     static fromJSON(json) {
-      return new User({
+      return new Users({
         userId: json.userId,
         username: json.username,
         displayName: json.displayName,
