@@ -73,3 +73,10 @@ input.input {
   border: 1px solid #ddd;
   border-radius: 10px;
 }
+
+.input-message {
+  width: 100;
+}
+.input-group {
+ width: 100%;
+}
