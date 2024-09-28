@@ -1,11 +1,14 @@
-import React, { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import React, { useState, useEffect, useRef } from "react";
+import { Link, Navigate, useParams, useNavigate } from "react-router-dom";
 import { io } from "socket.io-client";
 import "./ChatRoom.css"; // Assuming you have this file for styling
 
 const socket = io.connect("http://localhost:3001");
 
 export default function RoomPage() {
+  const displayName = localStorage.getItem("display_name");
+  const username = localStorage.getItem("username");
+
   const { roomID } = useParams(); // Use roomID from the URL
   const navigate = useNavigate();
   const [chatRooms, setChatRooms] = useState([]);
@@ -14,7 +17,20 @@ export default function RoomPage() {
   const [joinedRoom, setJoinedRoom] = useState(false);
   const [messages, setMessages] = useState([]); // State to hold chat messages
   const [messageInput, setMessageInput] = useState(""); // State for input field
-   
+  const [userName, setUserName] = useState(displayName);
+  const messagesEndRef = useRef(null); // สร้าง ref เพื่อใช้เลื่อนลง
+
+  const scrollToBottom = () => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({
+        behavior: "smooth",
+      }); // เลื่อนไปที่ข้อความสุดท้าย
+    }
+  };
+
+  useEffect(() => {
+    scrollToBottom(); // เรียกใช้ทุกครั้งที่ messages มีการอัปเดต
+  }, [messages]);
 
   useEffect(() => {
     // Fetch chat rooms
@@ -31,7 +47,10 @@ export default function RoomPage() {
 
       // Listen for incoming messages
       socket.on("message", (message) => {
-        setMessages((prevMessages) => [...prevMessages, message]);
+        setMessages((prevMessages) => [
+          ...prevMessages,
+          { sender: message.sender, text: message.text },
+        ]);
       });
     }
 
@@ -73,7 +92,11 @@ export default function RoomPage() {
 
   const handleSendMessage = () => {
     if (messageInput.trim() !== "" && currentRoom) {
-      const message = { room: currentRoom, text: messageInput };
+      const message = {
+        room: currentRoom,
+        sender: userName,
+        text: messageInput,
+      };
 
       socket.emit("sendMessage", message); // Emit the message to the server
       setMessageInput(""); // Clear the input field
@@ -84,7 +107,7 @@ export default function RoomPage() {
     <div>
       <div className="container absolute inset-x-0 top-0">
         <header>Chat Application</header>
-
+        <h1>{displayName}</h1>
         <div className="grid grid-cols-5 gap-2 self-center mt-10 h-[32rem]">
           {/* Chat Room List */}
           <div className="flex justify-center">
@@ -122,8 +145,32 @@ export default function RoomPage() {
                         <div className="messages">
                           <div class="w-full h-80 overflow-auto touch-auto">
                             {messages.map((msg, index) => (
-                              <div key={index}>{msg.text}</div>
+                              <div
+                                key={index}
+                                className={`flex ${
+                                  msg.sender === userName
+                                    ? "justify-end"
+                                    : "justify-start"
+                                } mb-2`}
+                              >
+                                <div
+                                  className={`${
+                                    msg.sender === userName
+                                      ? "bg-blue-500 text-white"
+                                      : "bg-gray-300 text-black"
+                                  } p-2 rounded-lg max-w-xs break-words`}
+                                >
+                                  <span>{msg.text}</span>
+                                  <br />
+                                  <small className="text-xs text-gray-600">
+                                    {msg.sender === userName
+                                      ? "You"
+                                      : msg.sender}
+                                  </small>
+                                </div>
+                              </div>
                             ))}
+                            <div ref={messagesEndRef} />
                           </div>
                         </div>
                       </div>

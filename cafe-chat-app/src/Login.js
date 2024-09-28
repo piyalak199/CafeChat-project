@@ -32,7 +32,7 @@ function Login() {
   const getAuthenToken = async () => {
     try {
       const data = await API_POST("authen_request", {
-        username: md5(username), // ส่งค่า username ที่แฮชแล้วด้วย md5
+        username: md5(username), // ส่งค่า username ด้วย md5
       });
 
       return data;

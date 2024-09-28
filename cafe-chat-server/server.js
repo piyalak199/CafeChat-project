@@ -45,21 +45,21 @@ io.on('connection', (socket) => {
   // Join a specific chat room
   socket.on('joinRoom', (roomID) => {
     socket.join(roomID);
-    console.log(`User ${socket.id} joined room ${roomID}`);
+    console.log(`User joined room ${roomID}`);
   });
 
   // Leave a specific chat room
   socket.on('leaveRoom', (roomID) => {
     socket.leave(roomID);
-    console.log(`User ${socket.id} left room ${roomID}`);
+    console.log(`User left room ${roomID}`);
   });
 
   // Handle sending messages to a specific room
   socket.on('sendMessage', (message) => {
-    const { room, text } = message;
+    const { room, text, sender } = message;
     if (room) {
-      io.to(room).emit('message', { text });
-      console.log(`Message sent to room ${room}: ${text}`);
+      io.to(room).emit('message', { text, sender });
+      console.log(` ${sender} send Message to room ${room}: ${text}`);
     }
   });
 
