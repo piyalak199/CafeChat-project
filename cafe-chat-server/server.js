@@ -382,20 +382,20 @@ app.get("/chatroom/:chatroomId", async (req, res) => {
   }
 });
 
-app.get("/api/pettype", checkAuth, (req, res) => {
-  const query = "SELECT * FROM pettype";
+// app.get("/api/pettype", checkAuth, (req, res) => {
+//   const query = "SELECT * FROM pettype";
 
-  pool.query(query, (error, results) => {
-    if (error) {
-      res.json({
-        result: false,
-        message: error.message,
-      });
-    } else {
-      res.json({
-        result: true,
-        data: results,
-      });
-    }
-  });
-});
+//   pool.query(query, (error, results) => {
+//     if (error) {
+//       res.json({
+//         result: false,
+//         message: error.message,
+//       });
+//     } else {
+//       res.json({
+//         result: true,
+//         data: results,
+//       });
+//     }
+//   });
+// });
