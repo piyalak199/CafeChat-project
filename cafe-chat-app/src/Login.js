@@ -69,9 +69,15 @@ function Login() {
         localStorage.setItem("access_token", accessData.data.access_token);
         localStorage.setItem("user_id", accessData.data.account_info.userId);
         localStorage.setItem("username", accessData.data.account_info.username);
-        localStorage.setItem("display_name", accessData.data.account_info.displayName);
+        localStorage.setItem(
+          "display_name",
+          accessData.data.account_info.displayName
+        );
         localStorage.setItem("coin", accessData.data.account_info.coin);
-        localStorage.setItem("pettypeID", accessData.data.account_info.pettypeID);
+        localStorage.setItem(
+          "pettypeID",
+          accessData.data.account_info.pettypeID
+        );
         localStorage.setItem("petName", accessData.data.account_info.petName);
         localStorage.setItem("petImg", accessData.data.account_info.petImg);
         localStorage.setItem("roleID", accessData.data.account_info.roleID);
@@ -89,17 +95,32 @@ function Login() {
   return (
     <div className="Login">
       <div className="container absolute inset-x-0 top-0">
-        <header className="bg-black p-4"></header>
-        <div className="flex justify-start">
-          <Link to={"/"}>
-            <img src={homeicon} className="mt-2" alt="Homeicon" />
-          </Link>
-        </div>
+        <header className="bg-black"></header>
+        <nav className="navbar">
+          <div className="container-fluid">
+            <div className="row w-100 h-16 align-items-center justify-content-between">
+              {/* Home Icon */}
+              <Link className="col-auto">
+                <img
+                  src={homeicon}
+                  className="home-icon"
+                  alt="Home icon"
+                  onClick={() => navigate("/")}
+                />
+              </Link>
+            </div>
+          </div>
+        </nav>
         <div className="grid grid-flow-row auto-rows-max">
           <div className="flex justify-center">
             <div className="box-border h-[32rem] p-2 border-2 border-black rounded-3xl min-w-[450px]">
               <div className="flex justify-end m-0">
-                <Link to={"/"}>X</Link>
+                <button
+                  type="button"
+                  class="btn-close "
+                  aria-label="Close"
+                  onClick={() => navigate("/")}
+                ></button>
               </div>
               <div className="flex justify-center m-0 grid-flow-row auto-rows-max">
                 <img src={catL} className="max-w-60" alt="catL" />

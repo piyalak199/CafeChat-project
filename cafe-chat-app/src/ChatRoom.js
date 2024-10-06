@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link, Navigate, useParams, useNavigate } from "react-router-dom";
 import { io } from "socket.io-client";
+
 import "./ChatRoom.css"; // Assuming you have this file for styling
+import NavbarUser from "./NavbarUser.js";
 
 const socket = io.connect("http://localhost:3001");
 
@@ -105,105 +107,121 @@ export default function RoomPage() {
 
   return (
     <div>
-      <div className="container absolute inset-x-0 top-0">
-        <header>Chat Application</header>
-        <h1>{displayName}</h1>
-        <div className="grid grid-cols-5 gap-2 self-center mt-10 h-[32rem]">
-          {/* Chat Room List */}
-          <div className="flex justify-center">
-            <div className="items-center box-border h-full w-full mx-16 p-3 border border-black rounded-3xl">
-              <div className="grid grid-flow-row auto-rows-max">
-                {chatRooms.map((room) => (
-                  <button
-                    key={room.roomID}
-                    onClick={() => handleJoinRoom(room)}
-                  >
-                    {room.roomName}
-                  </button>
-                ))}
+    
+        <div className="container absolute inset-x-0 top-0">
+        <NavbarUser />
 
-                <button onClick={handleLeaveRoom}>Leave Room</button>
+          <div className="flex justify-center">
+            <div class="border-b border-black h-32 w-full mx-40 mb-10 rounded-0">
+              <div className="grid grid-cols-5 gap-2 ">
+                <div className="col-start-1 ">a</div>
+                <div className="col-start-2">b</div>
+                <div className="col-start-3">c</div>
+                <div className="col-start-4">d</div>
+                <div className="col-start-5">e</div>
               </div>
             </div>
           </div>
 
-          {/* Chat Messages Section */}
-          <div className="col-span-4 flex justify-center">
-            <div className="box-border h-full w-full mr-16 p-4 border border-black rounded-3xl message-container">
-              <div>
-                {joinedRoom ? (
-                  <div>
-                    <div class="grid grid-rows-10 grid-col-1 gap-2">
-                      <div class="row-span-1 ">
-                        <h2 className="row">
-                          {currentRoomName
-                            ? `Room: ${currentRoomName}`
-                            : "Select a room to start chatting"}
-                        </h2>
-                      </div>
-                      <div class="row-start-2 row-end-10">
-                        <div className="messages">
-                          <div class="w-full h-80 overflow-auto touch-auto">
-                            {messages.map((msg, index) => (
-                              <div
-                                key={index}
-                                className={`flex ${
-                                  msg.sender === userName
-                                    ? "justify-end"
-                                    : "justify-start"
-                                } mb-2`}
-                              >
+          <div className="grid grid-cols-5 gap-2 self-center mt-10 h-[32rem]">
+            {/* Chat Room List */}
+            <div className="flex justify-center">
+              <div className="items-center box-border h-full w-full mx-16 p-3 border border-black rounded-3xl">
+                <div className="grid grid-flow-row auto-rows-max">
+                  {chatRooms.map((room) => (
+                    <button
+                      key={room.roomID}
+                      onClick={() => handleJoinRoom(room)}
+                    >
+                      {room.roomName}
+                    </button>
+                  ))}
+
+                  <button onClick={handleLeaveRoom}>Leave Room</button>
+                </div>
+              </div>
+            </div>
+
+            {/* Chat Messages Section */}
+            <div className="col-span-4 flex justify-center">
+              <div className="box-border h-full w-full mr-16 p-4 border border-black rounded-3xl message-container">
+                <div>
+                  {joinedRoom ? (
+                    <div>
+                      <div class="grid grid-rows-10 grid-col-1 gap-2">
+                        <div class="row-span-1 ">
+                          <h2 className="row">
+                            {currentRoomName
+                              ? `Room: ${currentRoomName}`
+                              : "Select a room to start chatting"}
+                          </h2>
+                        </div>
+                        <div class="row-start-2 row-end-10">
+                          <div className="messages">
+                            <div class="w-full h-80 overflow-auto touch-auto">
+                              {messages.map((msg, index) => (
                                 <div
-                                  className={`${
+                                  key={index}
+                                  className={`flex ${
                                     msg.sender === userName
-                                      ? "bg-blue-500 text-white"
-                                      : "bg-gray-300 text-black"
-                                  } p-2 rounded-lg max-w-xs break-words`}
+                                      ? "justify-end"
+                                      : "justify-start"
+                                  } mb-2`}
                                 >
-                                  <span>{msg.text}</span>
-                                  <br />
-                                  <small className="text-xs text-gray-600">
-                                    {msg.sender === userName
-                                      ? "You"
-                                      : msg.sender}
-                                  </small>
+                                  <div
+                                    className={`${
+                                      msg.sender === userName
+                                        ? "bg-blue-500 text-white"
+                                        : "bg-gray-300 text-black"
+                                    } p-2 rounded-lg max-w-xs break-words`}
+                                  >
+                                    <span>{msg.text}</span>
+                                    <br />
+                                    <small className="text-xs text-gray-600">
+                                      {msg.sender === userName
+                                        ? "You"
+                                        : msg.sender}
+                                    </small>
+                                  </div>
                                 </div>
-                              </div>
-                            ))}
-                            <div ref={messagesEndRef} />
+                              ))}
+                              <div ref={messagesEndRef} />
+                            </div>
                           </div>
                         </div>
-                      </div>
-                      <div class="row-start-10 row-end-10">
-                        <div className="position-relative">
-                          <div className="input-group ">
-                            <input
-                              type="text"
-                              value={messageInput}
-                              onChange={(e) => setMessageInput(e.target.value)}
-                              placeholder="Type your message..."
-                              className="form-control message-input"
-                              aria-label="Message"
-                            />
-                            <button
-                              onClick={handleSendMessage}
-                              className="btn btn-primary"
-                            >
-                              Send
-                            </button>
+                        <div class="row-start-10 row-end-10">
+                          <div className="position-relative">
+                            <div className="input-group ">
+                              <input
+                                type="text"
+                                value={messageInput}
+                                onChange={(e) =>
+                                  setMessageInput(e.target.value)
+                                }
+                                placeholder="Type your message..."
+                                className="form-control message-input"
+                                aria-label="Message"
+                              />
+                              <button
+                                onClick={handleSendMessage}
+                                className="btn btn-primary"
+                              >
+                                Send
+                              </button>
+                            </div>
                           </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                ) : (
-                  <div>Select a room to start chatting with friends.</div>
-                )}
+                  ) : (
+                    <div> เลือกห้องแชทเพื่อเริ่มพูดคุยสิ !!! </div>
+                  )}
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
+
     </div>
   );
 }

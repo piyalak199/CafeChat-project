@@ -7,6 +7,7 @@ const bodyParser = require("body-parser");
 
 const User = require("./libs/User");
 const ChatRoom = require("./libs/ChatRoom");
+const Pettype = require("./libs/PetType");
 
 const cors = require("cors");
 const express = require("express");
@@ -32,6 +33,7 @@ const server = app.listen(port, () => {
 });
 
 const { Server } = require("socket.io");
+const { error } = require("console");
 const io = new Server(server, {
   cors: {
     origin: "http://localhost:3000",
@@ -39,35 +41,34 @@ const io = new Server(server, {
   },
 });
 // Socket.IO event handling
-io.on('connection', (socket) => {
-  console.log('A user connected:', socket.id);
+io.on("connection", (socket) => {
+  console.log("A user connected:", socket.id);
 
   // Join a specific chat room
-  socket.on('joinRoom', (roomID) => {
+  socket.on("joinRoom", (roomID) => {
     socket.join(roomID);
     console.log(`User joined room ${roomID}`);
   });
 
   // Leave a specific chat room
-  socket.on('leaveRoom', (roomID) => {
+  socket.on("leaveRoom", (roomID) => {
     socket.leave(roomID);
     console.log(`User left room ${roomID}`);
   });
 
   // Handle sending messages to a specific room
-  socket.on('sendMessage', (message) => {
+  socket.on("sendMessage", (message) => {
     const { room, text, sender } = message;
     if (room) {
-      io.to(room).emit('message', { text, sender });
+      io.to(room).emit("message", { text, sender });
       console.log(` ${sender} send Message to room ${room}: ${text}`);
     }
   });
 
-  socket.on('disconnect', () => {
-    console.log('A user disconnected:', socket.id);
+  socket.on("disconnect", () => {
+    console.log("A user disconnected:", socket.id);
   });
 });
-
 
 // Fetch chat rooms
 app.get("/chatrooms", (req, res) => {
@@ -80,10 +81,14 @@ app.get("/chatrooms", (req, res) => {
 // Fetch specific chat room
 app.get("/chatrooms/:id", (req, res) => {
   const roomID = req.params.id;
-  pool.query("SELECT * FROM chatroom WHERE roomID = ?", [roomID], (error, results) => {
-    if (error) throw error;
-    res.json(results[0]);
-  });
+  pool.query(
+    "SELECT * FROM chatroom WHERE roomID = ?",
+    [roomID],
+    (error, results) => {
+      if (error) throw error;
+      res.json(results[0]);
+    }
+  );
 });
 
 app.get("/", (req, res) => {
@@ -91,7 +96,6 @@ app.get("/", (req, res) => {
 });
 
 app.use("/img", express.static("img"));
-
 
 app.post("/login", (req, res) => {
   const username = req.body.username;
@@ -238,6 +242,31 @@ let checkAuth = (req, res, next) => {
   }
 };
 
+app.post("/logout", (req, res) => {
+  const token = req.headers.authorization?.split(" ")[1];
+
+  if (token) {
+    invalidateToken(token);
+
+    res.status(200).send({
+      result: true,
+      message: "ออกจากระบบเรียบร้อยแล้ว",
+    });
+  } else {
+    res.status(401).send({
+      result: false,
+      message: "ไม่ได้รับโทเค็น",
+    });
+  }
+});
+
+// ฟังก์ชันสมมุติเพื่อยกเลิกโทเค็น
+function invalidateToken(token) {
+  // ทำการลบโทเค็นออกจากฐานข้อมูล หรือเก็บใน blacklist
+  // database.deleteToken(token); // ตัวอย่างการลบโทเค็นออกจากฐานข้อมูล
+  console.log(`Token ${token} invalidated.`);
+}
+
 app.get("/api/Register", (req, res) => {
   const query = "SELECT * FROM roles";
 
@@ -339,16 +368,34 @@ app.get("/chatroom/:chatroomId", async (req, res) => {
   const chatroomId = req.params.chatroomId;
 
   try {
-      var results = await ChatRoom.getByRoomID[pool, chatroomId];
+    var results = await ChatRoom.getByRoomID[(pool, chatroomId)];
 
-      res.json({
-          result: true,
-          data: results
-      });
+    res.json({
+      result: true,
+      data: results,
+    });
   } catch (ex) {
-      res.json({
-          result: false,
-          message: ex.message
-      });
+    res.json({
+      result: false,
+      message: ex.message,
+    });
   }
+});
+
+app.get("/api/pettype", checkAuth, (req, res) => {
+  const query = "SELECT * FROM pettype";
+
+  pool.query(query, (error, results) => {
+    if (error) {
+      res.json({
+        result: false,
+        message: error.message,
+      });
+    } else {
+      res.json({
+        result: true,
+        data: results,
+      });
+    }
+  });
 });

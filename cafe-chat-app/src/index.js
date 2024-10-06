@@ -57,18 +57,18 @@ import Home from "./Home";
 import ChatRoom from "./ChatRoom";
 import PetSelect from "./PetSelect";
 import App from "./App";
+import CheckAuth from "./CheckAuth";
 
 // Create a router with different paths
 const router = createBrowserRouter([
   { path: "/", element: <App /> },
   { path: "/login", element: <Login /> },
   { path: "/signup", element: <Signup /> },
-  { path: "/dressup", element: <DressUp /> },
-  { path: "/home", element: <Home /> },
-  { path: "/chatroom", element: <ChatRoom /> },
-  { path: "/chatroom/:roomID", element: <ChatRoom /> },
-  { path: "/petselect", element: <PetSelect /> },
-
+  { path: "/dressup", element: (<CheckAuth><DressUp /></CheckAuth>) },
+  { path: "/home", element: (<CheckAuth><Home /></CheckAuth>) },
+  { path: "/chatroom", element: (<CheckAuth><ChatRoom /></CheckAuth>)},
+  { path: "/chatroom/:roomID", element:(<CheckAuth>< ChatRoom/></CheckAuth>)},
+  { path: "/petselect", element: (<CheckAuth><PetSelect /></CheckAuth>) },
 ]);
 
 // Create root for rendering
@@ -78,8 +78,6 @@ root.render(
     <RouterProvider router={router} />
   </React.StrictMode>
 );
-
-
 
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))
