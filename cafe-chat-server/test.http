@@ -10,7 +10,7 @@
 
 # GET http://localhost:3001/chatroom/2
 
-# GET http://localhost:3001/pettype
+# GET http://localhost:3001/api/pettype
 
 # POST http://localhost:3001/api/Register/add HTTP/1.1
 # Content-Type: application/json

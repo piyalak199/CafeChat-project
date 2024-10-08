@@ -17,11 +17,11 @@ const NavbarUser = () => {
   const handleLogout = () => {
     // ลบข้อมูลการเข้าสู่ระบบจาก localStorage
     localStorage.removeItem("access_token");
-    localStorage.removeItem("user_id");
+    localStorage.removeItem("userID");
     localStorage.removeItem("username");
-    localStorage.removeItem("display_name");
+    localStorage.removeItem("displayName");
     localStorage.removeItem("coin");
-    localStorage.removeItem("pettypeID");
+    localStorage.removeItem("petTypeID");
     localStorage.removeItem("petName");
     localStorage.removeItem("petImg");
     localStorage.removeItem("roleID");

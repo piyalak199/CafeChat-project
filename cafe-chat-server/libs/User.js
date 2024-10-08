@@ -1,9 +1,9 @@
 const mysql = require("mysql");
 
 module.exports = {
-  createUser: async (pool, username, password, roleID) => {
+  createUser: async (pool, username, password, roleID, petTypeID) => {
     var sql =
-      "INSERT INTO user ( username, password, roleID ) " +
+      "INSERT INTO user ( username, password, roleID) " +
       "VALUES (?, MD5(?), ?) ";
     sql = mysql.format(sql, [username, password, roleID]);
 
@@ -17,15 +17,16 @@ module.exports = {
     return await pool.query(sql);
   },
 
-  updateUser: async (pool, userID, username, password, displayName) => {
+  updateUser: async (pool, userID, username, password, displayName, petTypeID) => {
     var sql =
       "UPDATE user SET " +
       "username=?, " +
       "password=MD5(?), " +
       "displayName=?, " +
+      "petTypeID=?, "+
       "WHERE user.userID = ? ";
 
-    sql = mysql.format(sql, [userID, username, password, displayName]);
+    sql = mysql.format(sql, [userID, username, password, displayName, petTypeID]);
 
     return await pool.query(sql);
   },
@@ -36,4 +37,5 @@ module.exports = {
 
     return await pool.query(sql);
   },
+
 };

@@ -10,7 +10,7 @@ import "./Home.css";
 import NavbarUser from "./NavbarUser.js";
 
 function Home() {
-  const displayName = localStorage.getItem("display_name");
+  const displayName = localStorage.getItem("displayName");
 
   return (
     <div>
