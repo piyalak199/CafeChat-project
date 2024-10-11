@@ -1,46 +1,89 @@
-// import React, { useEffect, useState } from "react";
-// import { API_GET } from "./api"; // นำเข้า API_GET จากไฟล์ api.js
+import React, { useEffect, useState } from "react";
+import "bootstrap/dist/css/bootstrap.min.css";
+import { API_GET, API_POST } from "./api";
+import NavbarUser from "./NavbarUser.js";
+import "./PetSelect.css";
 
-// const PetSelect = () => {
-//     const [petTypes, setPetTypes] = useState([]); // สร้าง state สำหรับเก็บข้อมูล pet types
-//     const [loading, setLoading] = useState(true); // สร้าง state สำหรับเก็บสถานะการโหลดข้อมูล
-//     const [error, setError] = useState(null); // สร้าง state สำหรับเก็บ error
+function PetSelect() {
+  const userID = localStorage.getItem("userID"); // Ensure you're using userID here
+  const petUserID = localStorage.getItem("petTypeID"); // จะนำไปใช้ได้ เช่น ปุ่มที่แสดงว่า userID นี้มีข้อมูล petTypeID ใดอยู่ใน database
+  const [petTypes, setPetTypes] = useState([]);
+  const [currentPetTypeID, setCurrentPetTypeID] = useState(petUserID); // State to hold current petTypeID
 
-//     // ฟังก์ชันเรียก API เพื่อดึงข้อมูลประเภทสัตว์
-//     useEffect(() => {
-//         const fetchPetTypes = async () => {
-//             try {
-//                 setLoading(true); // เริ่มโหลดข้อมูล
-//                 const response = await API_GET("pettype"); // เรียก API ที่ url pettype
-//                 setPetTypes(response.data || []); // ถ้าข้อมูลมีใน response.data ก็เซตให้กับ state
-//             } catch (err) {
-//                 setError(err.message); // ถ้ามี error จัดเก็บใน state error
-//             } finally {
-//                 setLoading(false); // จบการโหลดข้อมูลไม่ว่าจะสำเร็จหรือไม่
-//             }
-//         };
+  // Fetch pet types and current user's petTypeID
+  useEffect(() => {
+    const fetchPetTypes = async () => {
+      try {
+        // Fetch pet types
+        const response = await API_GET("pettype");
+        setPetTypes(response.data);
 
-//         fetchPetTypes(); // เรียกฟังก์ชัน fetch เมื่อ component ถูก mount
-//     }, []); // [] ทำให้ useEffect เรียกเพียงครั้งเดียวหลังจาก render
+        // Fetch current user's petTypeID
+        const userResponse = await API_GET(`user/${userID}`);
+        setCurrentPetTypeID(userResponse.data.petTypeID); // Assuming the response contains petTypeID
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
 
-//     return (
-//         <div>
-//             <h1>Select Your Pet</h1>
-//             {loading ? (
-//                 <p>Loading...</p> // แสดงข้อความขณะกำลังโหลดข้อมูล
-//             ) : error ? (
-//                 <p>Error: {error}</p> // แสดงข้อความเมื่อมี error
-//             ) : petTypes.length > 0 ? (
-//                 <ul>
-//                     {petTypes.map((petType) => (
-//                         <li key={petType.id}>{petType.name}</li> // แสดงข้อมูลประเภทสัตว์
-//                     ))}
-//                 </ul>
-//             ) : (
-//                 <p>No pet types available.</p> // แสดงเมื่อไม่มีข้อมูล
-//             )}
-//         </div>
-//     );
-// };
+    fetchPetTypes();
+  }, [userID]);
 
-// export default PetSelect;
+  // Function to handle button click
+  const handlePetTypeChange = async (newPetTypeID) => {
+    if (currentPetTypeID === newPetTypeID) {
+      console.log("This pet type is already selected.");
+      return; // Do nothing if the pet type is already selected
+    }
+
+    try {
+      // Update pet type in the database
+      const response = await API_POST("updatePetType", {
+        userID: userID,
+        petTypeID: newPetTypeID,
+      });
+      console.log("Pet type updated:", response.message);
+
+      // Update local storage and state
+      localStorage.setItem("petTypeID", newPetTypeID);
+      setCurrentPetTypeID(newPetTypeID); // Update state to reflect the change
+    } catch (error) {
+      console.error("Error updating pet type:", error);
+    }
+  };
+
+  return (
+    <div className="container absolute inset-x-0 top-0">
+      <NavbarUser />
+      <div className="row flex justify-center">
+        {petTypes.map((pet) => (
+          <div className={`col-md-auto mx-20`} key={pet.petTypeID}>
+            <div className="text-center">
+              <img
+                src={`http://localhost:3001/img/Pets/${pet.petImg}`}
+                alt={pet.petName}
+                className="img-fluid"
+              />
+
+              <button
+                type="button"
+                className={`btn btn-selectpet m-2 ${
+                  currentPetTypeID === pet.petTypeID
+                    ? "btn-current "
+                    : "btn-default"
+                }`}
+                onClick={() => handlePetTypeChange(pet.petTypeID)}
+              >
+                {pet.petName}
+              </button>
+            </div>
+         
+
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+export default PetSelect;

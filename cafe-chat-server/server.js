@@ -7,7 +7,6 @@ const bodyParser = require("body-parser");
 
 const User = require("./libs/User");
 const ChatRoom = require("./libs/ChatRoom");
-const Pettype = require("./libs/PetType");
 
 const cors = require("cors");
 const express = require("express");
@@ -40,6 +39,51 @@ const io = new Server(server, {
     methods: ["GET", "POST"],
   },
 });
+// let roomUsers = {};
+
+// io.on('connection', (socket) => {
+//   console.log('New user connected');
+
+//   // Join room
+//   socket.on('joinRoom', ({ roomID, userName }) => {
+//     socket.join(roomID);
+
+//     // Add user to room
+//     if (!roomUsers[roomID]) {
+//       roomUsers[roomID] = [];
+//     }
+//     roomUsers[roomID].push(userName);
+
+//     // Notify all users in the room of the updated user list
+//     io.to(roomID).emit('roomUsers', roomUsers[roomID]);
+//     console.log(`${userName} joined room: ${roomID}`);
+//   });
+
+//   // Handle user leaving the room
+//   socket.on('leaveRoom', ({ roomID, userName }) => {
+//     socket.leave(roomID);
+
+//     // Remove user from room
+//     roomUsers[roomID] = roomUsers[roomID].filter((user) => user !== userName);
+
+//     // Notify all users in the room of the updated user list
+//     io.to(roomID).emit('roomUsers', roomUsers[roomID]);
+//     console.log(`${userName} left room: ${roomID}`);
+//   });
+
+//   // Handle user disconnecting
+//   socket.on('disconnect', () => {
+//     // Find which room the disconnected user was in and remove them
+//     for (const roomID in roomUsers) {
+//       roomUsers[roomID] = roomUsers[roomID].filter(
+//         (user) => user !== socket.userName
+//       );
+//       io.to(roomID).emit('roomUsers', roomUsers[roomID]);
+//     }
+//     console.log('User disconnected');
+//   });
+// });
+
 // Socket.IO event handling
 io.on("connection", (socket) => {
   console.log("A user connected:", socket.id);
@@ -181,15 +225,15 @@ app.post("/api/access_request", (req, res) => {
       } else {
         if (results.length) {
           var payload = {
-            userId: results[0].userID,
+            userID: results[0].userID,
             username: results[0].username,
             displayName: results[0].displayName,
             coin: results[0].coin,
-            pettypeID: results[0].pettypeID,
-            petName: results[0].petName,
-            petImg: results[0].petImg,
+            petTypeID: results[0].petTypeID,
+            // petName: results[0].petName,
+            // petImg: results[0].petImg,
             roleID: results[0].roleID,
-            roleName: results[0].roleName,
+            // roleName: results[0].roleName,
           };
           const accessToken = jwt.sign(payload, "MySecretKey");
           response = {
@@ -382,20 +426,61 @@ app.get("/chatroom/:chatroomId", async (req, res) => {
   }
 });
 
-// app.get("/api/pettype", checkAuth, (req, res) => {
-//   const query = "SELECT * FROM pettype";
+// Get all pet types
+app.get("/api/pettype", checkAuth, (req, res) => {
+  const query = "SELECT * FROM pettype";
 
-//   pool.query(query, (error, results) => {
-//     if (error) {
-//       res.json({
-//         result: false,
-//         message: error.message,
-//       });
-//     } else {
-//       res.json({
-//         result: true,
-//         data: results,
-//       });
-//     }
-//   });
-// });
+  pool.query(query, (error, results) => {
+    if (error) {
+      return res.json({
+        result: false,
+        message: error.message,
+      });
+    }
+    res.json({
+      result: true,
+      data: results,
+    });
+  });
+});
+// Route to get pet types
+app.get("/api/pettype", (req, res) => {
+  const sql = "SELECT petTypeID, petName, petImg FROM pettype";
+  pool.query(sql, (err, result) => {
+    if (err) {
+      return res.status(500).send({ message: "Error fetching pet types" });
+    }
+    res.send({ data: result });
+  });
+});
+
+// Route to get user details (including petTypeID)
+app.get("/api/user/:userID", (req, res) => {
+  const userID = req.params.userID;
+  const sql = "SELECT petTypeID FROM user WHERE userID = ?";
+  pool.query(sql, [userID], (err, result) => {
+    if (err) {
+      return res.status(500).send({ message: "Error fetching user data" });
+    }
+    if (result.length === 0) {
+      return res.status(404).send({ message: "User not found" });
+    }
+    res.send({ data: result[0] });
+  });
+});
+
+// Route to update the user's pet type
+app.post("/api/updatePetType", (req, res) => {
+  const { userID, petTypeID } = req.body;
+  const sql = "UPDATE users SET petTypeID = ? WHERE userID = ?";
+
+  pool.query(sql, [petTypeID, userID], (err, result) => {
+    if (err) {
+      return res.status(500).send({ message: "Error updating pet type" });
+    }
+    if (result.affectedRows === 0) {
+      return res.status(404).send({ message: "User not found" });
+    }
+    res.send({ message: "Pet type updated successfully" });
+  });
+});

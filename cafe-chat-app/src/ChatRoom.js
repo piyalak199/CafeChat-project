@@ -8,7 +8,7 @@ import NavbarUser from "./NavbarUser.js";
 const socket = io.connect("http://localhost:3001");
 
 export default function RoomPage() {
-  const displayName = localStorage.getItem("display_name");
+  const displayName = localStorage.getItem("displayName");
   const username = localStorage.getItem("username");
 
   const { roomID } = useParams(); // Use roomID from the URL
@@ -107,121 +107,128 @@ export default function RoomPage() {
 
   return (
     <div>
-    
-        <div className="container absolute inset-x-0 top-0">
+      <div className="container absolute inset-x-0 top-0">
         <NavbarUser />
 
+        <div className="flex justify-center">
+          <div class="border-b border-black h-32 w-full mx-40 mb-10 rounded-0">
+            <div className="grid grid-cols-5 gap-2 ">
+              <div className="col-start-1 ">a</div>
+              <div className="col-start-2">b</div>
+              <div className="col-start-3">c</div>
+              <div className="col-start-4">d</div>
+              <div className="col-start-5">e</div>
+            </div>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-5 gap-2 self-center mt-10 h-[32rem]">
+          {/* Chat Room List */}
           <div className="flex justify-center">
-            <div class="border-b border-black h-32 w-full mx-40 mb-10 rounded-0">
-              <div className="grid grid-cols-5 gap-2 ">
-                <div className="col-start-1 ">a</div>
-                <div className="col-start-2">b</div>
-                <div className="col-start-3">c</div>
-                <div className="col-start-4">d</div>
-                <div className="col-start-5">e</div>
+            <div className="items-center box-border h-full w-full mx-16 p-3 border border-black rounded-3xl">
+              <div className="grid grid-flow-row auto-rows-max">
+                {chatRooms.map((room) => (
+                  <button
+                    key={room.roomID}
+                    onClick={() => handleJoinRoom(room)}
+                  >
+                    {room.roomName}
+                  </button>
+                ))}
+
+                <button onClick={handleLeaveRoom}>Leave Room</button>
               </div>
             </div>
           </div>
 
-          <div className="grid grid-cols-5 gap-2 self-center mt-10 h-[32rem]">
-            {/* Chat Room List */}
-            <div className="flex justify-center">
-              <div className="items-center box-border h-full w-full mx-16 p-3 border border-black rounded-3xl">
-                <div className="grid grid-flow-row auto-rows-max">
-                  {chatRooms.map((room) => (
-                    <button
-                      key={room.roomID}
-                      onClick={() => handleJoinRoom(room)}
-                    >
-                      {room.roomName}
-                    </button>
-                  ))}
-
-                  <button onClick={handleLeaveRoom}>Leave Room</button>
-                </div>
-              </div>
-            </div>
-
-            {/* Chat Messages Section */}
-            <div className="col-span-4 flex justify-center">
-              <div className="box-border h-full w-full mr-16 p-4 border border-black rounded-3xl message-container">
-                <div>
-                  {joinedRoom ? (
-                    <div>
-                      <div class="grid grid-rows-10 grid-col-1 gap-2">
-                        <div class="row-span-1 ">
-                          <h2 className="row">
-                            {currentRoomName
-                              ? `Room: ${currentRoomName}`
-                              : "Select a room to start chatting"}
-                          </h2>
-                        </div>
-                        <div class="row-start-2 row-end-10">
-                          <div className="messages">
-                            <div class="w-full h-80 overflow-auto touch-auto">
-                              {messages.map((msg, index) => (
-                                <div
-                                  key={index}
-                                  className={`flex ${
-                                    msg.sender === userName
-                                      ? "justify-end"
-                                      : "justify-start"
-                                  } mb-2`}
-                                >
-                                  <div
-                                    className={`${
-                                      msg.sender === userName
-                                        ? "bg-blue-500 text-white"
-                                        : "bg-gray-300 text-black"
-                                    } p-2 rounded-lg max-w-xs break-words`}
-                                  >
-                                    <span>{msg.text}</span>
-                                    <br />
-                                    <small className="text-xs text-gray-600">
+          {/* Chat Messages Section */}
+          <div className="col-span-4 flex justify-center">
+            <div className="box-border h-full w-full mr-16 p-4 border border-black rounded-3xl message-container">
+              <div>
+                {joinedRoom ? (
+                  <div>
+                    <div class="grid grid-rows-10 grid-col-1 gap-2">
+                      <div class="row-span-1 ">
+                        <h2 className="row">
+                          {currentRoomName
+                            ? `Room: ${currentRoomName}`
+                            : "Select a room to start chatting"}
+                        </h2>
+                      </div>
+                      <div class="row-start-2 row-end-10">
+                        <div className="messages">
+                          <div className="w-full h-80 overflow-auto touch-auto">
+                            {messages.map((msg, index) => (
+                              <div
+                                key={index}
+                                className={`flex ${
+                                  msg.sender === userName
+                                    ? "justify-end"
+                                    : "justify-start"
+                                } mb-2`}
+                              >
+                                <div className="text-right">
+                                  {" "}
+                                  {/* ใช้ text-right เมื่อเป็นข้อความของผู้ใช้ */}
+                                  <div>
+                                    <small
+                                      className={`text-xs text-gray-600 ${
+                                        msg.sender === userName
+                                          ? "float-right"
+                                          : "float-left"
+                                      }`} /* จัดให้ชื่ออยู่ขวาเมื่อเป็นของผู้ใช้ */
+                                    >
                                       {msg.sender === userName
                                         ? "You"
                                         : msg.sender}
                                     </small>
                                   </div>
+                                  <div
+                                    className={`${
+                                      msg.sender === userName
+                                        ? "bg-blue-500 text-white"
+                                        : "bg-gray-300 text-black"
+                                    } p-2 rounded-lg max-w-xs break-words clear-both`}
+                                  >
+                                    <span>{msg.text}</span>
+                                  </div>
                                 </div>
-                              ))}
-                              <div ref={messagesEndRef} />
-                            </div>
+                              </div>
+                            ))}
+                            <div ref={messagesEndRef} />
                           </div>
                         </div>
-                        <div class="row-start-10 row-end-10">
-                          <div className="position-relative">
-                            <div className="input-group ">
-                              <input
-                                type="text"
-                                value={messageInput}
-                                onChange={(e) =>
-                                  setMessageInput(e.target.value)
-                                }
-                                placeholder="Type your message..."
-                                className="form-control message-input"
-                                aria-label="Message"
-                              />
-                              <button
-                                onClick={handleSendMessage}
-                                className="btn btn-primary"
-                              >
-                                Send
-                              </button>
-                            </div>
+                      </div>
+                      <div class="row-start-10 row-end-10">
+                        <div className="position-relative">
+                          <div className="input-group ">
+                            <input
+                              type="text"
+                              value={messageInput}
+                              onChange={(e) => setMessageInput(e.target.value)}
+                              placeholder="Type your message..."
+                              className="form-control message-input"
+                              aria-label="Message"
+                            />
+                            <button
+                              onClick={handleSendMessage}
+                              className="btn btn-primary"
+                            >
+                              Send
+                            </button>
                           </div>
                         </div>
                       </div>
                     </div>
-                  ) : (
-                    <div> เลือกห้องแชทเพื่อเริ่มพูดคุยสิ !!! </div>
-                  )}
-                </div>
+                  </div>
+                ) : (
+                  <h4> เลือกห้องแชทเพื่อเริ่มพูดคุยสิ !!! </h4>
+                )}
               </div>
             </div>
           </div>
         </div>
-
+      </div>
     </div>
   );
 }

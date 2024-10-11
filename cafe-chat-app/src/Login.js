@@ -67,21 +67,18 @@ function Login() {
       if (accessData && accessData.result) {
         // เก็บโทเค็นและข้อมูลผู้ใช้ลงใน localStorage
         localStorage.setItem("access_token", accessData.data.access_token);
-        localStorage.setItem("user_id", accessData.data.account_info.userId);
+        localStorage.setItem("userID", accessData.data.account_info.userID);
         localStorage.setItem("username", accessData.data.account_info.username);
         localStorage.setItem(
-          "display_name",
+          "displayName",
           accessData.data.account_info.displayName
         );
         localStorage.setItem("coin", accessData.data.account_info.coin);
         localStorage.setItem(
-          "pettypeID",
-          accessData.data.account_info.pettypeID
+          "petTypeID",
+          accessData.data.account_info.petTypeID
         );
-        localStorage.setItem("petName", accessData.data.account_info.petName);
-        localStorage.setItem("petImg", accessData.data.account_info.petImg);
         localStorage.setItem("roleID", accessData.data.account_info.roleID);
-        localStorage.setItem("roleName", accessData.data.account_info.roleName);
 
         navigate("/home", { replace: true });
       } else {

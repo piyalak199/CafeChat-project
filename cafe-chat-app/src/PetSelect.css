@@ -1,62 +1,18 @@
-.pet-section {
-    position: relative;
-    text-align: center;
-    top: -80px;
-  }
-  
-  .pet-buttons {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 10px;
-    position: absolute;
-    bottom: 20px;
-    width: 100%;
-    left: 0;
-  }
-  
-  .pet-buttons button {
-    width: 80%;
-    margin: 0 auto;
-    padding: 10px;
-  }
-  
-  .pet-container {
-    display: flex;
-    align-items: center; /* จัดตำแหน่งในแนวตั้ง */
-    justify-content: center; /* จัดตำแหน่งในแนวนอน */
-    height: 100%; /* ให้คอนเทนเนอร์สูงเต็มพื้นที่ */
-  }
-  
-  .button-dog {
-    position: relative;
-    top: -1640px; /* ปรับขนาดตามต้องการเพื่อเลื่อนขึ้น */
-    right: -80px;
-  }
+.btn-selectpet {
+  border: 1px solid #000;
+  width: 100px;
+}
+.btn-current {
+  background-color:#c35650; /* เปลี่ยนเป็นสีที่คุณต้องการ */
+  color: white;
+}
 
-  .button-cat {
-    position: relative;
-    top: -1640px; /* ปรับขนาดตามต้องการเพื่อเลื่อนขึ้น */
-    right: 0px;
-  }
+.btn-default {
+  background-color: rgb(255, 255, 255); /* เปลี่ยนเป็นสีที่คุณต้องการ */
+  color: rgb(0, 0, 0);
+}
 
-  .button-rabbit {
-    position: relative;
-    top: -1640px; /* ปรับขนาดตามต้องการเพื่อเลื่อนขึ้น */
-    right: 25px;
-  }
-
-  .button-fish {
-    position: relative;
-    top: -1640px; /* ปรับขนาดตามต้องการเพื่อเลื่อนขึ้น */
-    right: 90px;
-  }
-
-  .wallpaper {
-    position: relative;
-    top: -600px;
-  }
-
-  .wordtwo {
-    position: relative;
-    top: -1320px;
-  }
+.btn-selectpet:hover {
+  border : 2px solid #c35650;
+  color: #c35650;
+}
