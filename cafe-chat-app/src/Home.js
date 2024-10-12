@@ -21,7 +21,7 @@ function Home() {
             แต่งตัว
           </Link>
         </div>
-        <Link className="button-shop" to="/dressup">
+        <Link className="button-shop" to="/shop">
           ร้านค้า
         </Link>
         <Link className="button-pet" to="/petselect">

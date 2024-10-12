@@ -70,7 +70,7 @@ function PetSelect() {
                 className={`btn btn-selectpet m-2 ${
                   currentPetTypeID === pet.petTypeID
                     ? "btn-current "
-                    : "btn-default"
+                    : "btn-default "
                 }`}
                 onClick={() => handlePetTypeChange(pet.petTypeID)}
               >

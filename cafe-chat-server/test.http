@@ -20,3 +20,5 @@
 #     "password": "aaaaaaaa" 
 # }
 
+
+GET http://localhost:3001/hats/1
