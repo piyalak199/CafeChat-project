@@ -11,7 +11,6 @@
   text-align: center; /* Centers the text */
   color: white; /* Makes the text white */
   font-size: 18px; /* Sets the font size */
-  font-family: "Arial", sans-serif; /* Sets the font family */
   cursor: pointer; /* Changes the cursor to a pointer when hovered */
   text-decoration: none; /* Removes any text decoration (e.g., underline) */
 }
@@ -28,7 +27,6 @@
   text-align: center;
   color: white;
   font-size: 18px;
-  font-family: "Arial", sans-serif;
   cursor: pointer;
   text-decoration: none;
 }
@@ -54,7 +52,6 @@
   text-align: center;
   color: white;
   font-size: 18px;
-  font-family: "Arial", sans-serif;
   cursor: pointer;
   text-decoration: none;
 }
