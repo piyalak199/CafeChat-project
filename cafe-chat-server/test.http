@@ -21,4 +21,14 @@
 # }
 
 
-GET http://localhost:3001/hats/1
+# GET http://localhost:3001/hats/1
+
+
+# POST http://localhost:3001/updateCoins HTTP/1.1
+# Content-Type: application/json
+
+# {
+#     "hatID": 3,
+#     "userID": 2
+# }
+

@@ -416,8 +416,7 @@ app.post("/api/updatePetType", checkAuth, (req, res) => {
 // สมมติว่ามีฟังก์ชัน getHatID ในโมดูล Hat
 app.get("/api/hats/:hatID", checkAuth, async (req, res) => {
   const hatID = req.params.hatID;
-  const sql =
-    "SELECT * FROM hat ";
+  const sql = "SELECT * FROM hat ";
 
   if (hatID == 0) {
     pool.query(sql, (error, results) => {
@@ -446,6 +445,39 @@ app.get("/api/hats/:hatID", checkAuth, async (req, res) => {
           data: results,
         });
       }
+    });
+  }
+});
+
+app.post("/api/updateCoins", async (req, res) => {
+  const { hatID, userID } = req.body;
+
+  try {
+    const result = await User.updateCoins(pool, hatID, userID);
+
+    // ตรวจสอบว่ามีการเปลี่ยนแปลงหรือไม่
+    res.json({ success: true, message: "Coins updated successfully!" });
+  } catch (error) {
+    console.error("Error updating coins:", error);
+    res.status(500).json({ success: false, message: "Internal server error." });
+  }
+});
+
+// Endpoint to add a hat to the user_hat table
+app.post("/api/addUserHat", async (req, res) => {
+  const input = req.body;
+
+  try {
+    // Call a method to insert a new user hat, ensure to create this method in your User model
+    var result = await User.addUserHat(pool, input.userID, input.hatID);
+
+    res.json({
+      result: true,
+    });
+  } catch (ex) {
+    res.json({
+      result: false,
+      message: ex.message,
     });
   }
 });

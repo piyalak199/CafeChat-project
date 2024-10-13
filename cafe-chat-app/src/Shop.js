@@ -2,15 +2,15 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { Modal, Button } from "react-bootstrap";
 import React, { useEffect, useState } from "react";
 import NavbarUser from "./NavbarUser";
-import { API_GET } from "./api"; // Import API_GET
+import { API_GET, API_POST } from "./api"; // Import API_GET and API_POST
 import bgShop from "./img/Shop/bgShop.png";
-import bow from "./img/Shop/bow.png";
 
 function Shop() {
   const [hats, setHats] = useState([]); // State to store hats
   const [loading, setLoading] = useState(true); // State to manage loading status
   const [showModal, setShowModal] = useState(false);
   const [selectedHat, setSelectedHat] = useState(null);
+  const userID = localStorage.getItem("userID"); // Get userID from localStorage
 
   useEffect(() => {
     const fetchHats = async () => {
@@ -37,11 +37,39 @@ function Shop() {
   }, []); // Empty dependency array ensures this runs once on mount
 
   const handleBuyClick = (hat) => {
-    setSelectedHat(hat); // Set the selected hat
-    setShowModal(true); // Show the modal
+    setSelectedHat(hat);
+    setShowModal(true);
   };
 
-  const handleClose = () => setShowModal(false); // Close modal
+  const handleClose = () => setShowModal(false);
+
+  const handleConfirmPurchase = async () => {
+    if (!selectedHat) return;
+
+    // Step 1: Update User Coins
+    const updateCoinsResponse = await API_POST('updateCoins', {
+      userID,
+      hatID: selectedHat.hatID, // Use selectedHat.hatID to deduct coins
+    });
+
+    // Step 2: Insert Hat into User_Hat
+    if (updateCoinsResponse.success) {
+      const addUserHatResponse = await API_POST('addUserHat', {
+        userID,
+        hatID: selectedHat.hatID,
+      });
+
+      if (addUserHatResponse.result) {
+        alert('ซื้อสำเร็จ!'); // Show success message
+      } else {
+        alert('การซื้อไม่สำเร็จ: ' + addUserHatResponse.message);
+      }
+    } else {
+      alert('การอัพเดตเหรียญไม่สำเร็จ: ' + updateCoinsResponse.message);
+    }
+
+    setShowModal(false); // Close modal after purchase
+  };
 
   if (loading) {
     return <div>Loading...</div>; // Show loading indicator while fetching
@@ -55,7 +83,7 @@ function Shop() {
         {/* Row 1: Avatar and Shop Name */}
         <h className="row mb-4">
           <div className="col text-center">
-            <img src={bgShop} alt="Avatar" className="img-fluid w-100 px-48" />
+            <img src={bgShop} alt="Shop Background" className="img-fluid w-100 px-48" />
           </div>
         </h>
 
@@ -92,8 +120,8 @@ function Shop() {
         </div>
       </div>
 
-       {/* Modal for purchasing a hat */}
-       <Modal show={showModal} onHide={handleClose}>
+      {/* Modal for purchasing a hat */}
+      <Modal show={showModal} onHide={handleClose}>
         <Modal.Header closeButton>
           <Modal.Title>ยืนยันการซื้อ</Modal.Title>
         </Modal.Header>
@@ -114,7 +142,7 @@ function Shop() {
           <Button variant="secondary" onClick={handleClose}>
             ยกเลิก
           </Button>
-          <Button variant="primary" onClick={handleClose}>
+          <Button variant="primary" onClick={handleConfirmPurchase}>
             ยืนยันการซื้อ
           </Button>
         </Modal.Footer>

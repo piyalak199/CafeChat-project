@@ -17,16 +17,29 @@ module.exports = {
     return await pool.query(sql);
   },
 
-  updateUser: async (pool, userID, username, password, displayName, petTypeID) => {
+  updateUser: async (
+    pool,
+    userID,
+    username,
+    password,
+    displayName,
+    petTypeID
+  ) => {
     var sql =
       "UPDATE user SET " +
       "username=?, " +
       "password=MD5(?), " +
       "displayName=?, " +
-      "petTypeID=?, "+
+      "petTypeID=?, " +
       "WHERE user.userID = ? ";
 
-    sql = mysql.format(sql, [userID, username, password, displayName, petTypeID]);
+    sql = mysql.format(sql, [
+      userID,
+      username,
+      password,
+      displayName,
+      petTypeID,
+    ]);
 
     return await pool.query(sql);
   },
@@ -38,4 +51,24 @@ module.exports = {
     return await pool.query(sql);
   },
 
+  addUserHat: async (pool, userID, hatID) => {
+    var sql =
+      'INSERT INTO user_hat (userID, hatID, hat_active) VALUES (?, ?, "n")';
+    sql = mysql.format(sql, [userID, hatID]);
+
+    return await pool.query(sql);
+  },
+
+  updateCoins: async (pool, hatID, userID) => {
+    var sql =
+      "UPDATE user u " +
+      " JOIN hat h ON h.hatID = ? " +
+      " SET u.coin = u.coin - h.hatCoin " +
+      " WHERE u.userID = ? ";
+
+    sql = mysql.format(sql, [hatID, userID]);
+
+    return await pool.query(sql);
+  }
+  
 };
