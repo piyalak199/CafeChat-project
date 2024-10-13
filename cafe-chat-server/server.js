@@ -481,3 +481,22 @@ app.post("/api/addUserHat", async (req, res) => {
     });
   }
 });
+
+app.get("/api/userHats/:userID", async (req, res) => {
+  const userID = req.params.userID;
+  const sql = "SELECT hatID FROM user_hat WHERE userID = ?";
+
+  pool.query(sql, [userID], (error, results) => {
+    if (error) {
+      res.json({
+        result: false,
+        message: error.message,
+      });
+    } else {
+      res.json({
+        result: true,
+        data: results,
+      });
+    }
+  });
+});

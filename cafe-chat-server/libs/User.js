@@ -69,6 +69,5 @@ module.exports = {
     sql = mysql.format(sql, [hatID, userID]);
 
     return await pool.query(sql);
-  }
-  
+  },
 };

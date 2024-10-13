@@ -7,7 +7,7 @@ import bgShop from "./img/Shop/bgShop.png";
 import { useNavigate } from "react-router-dom";
 
 function Shop() {
-  const navigate = useNavigate(); // ใช้ navigate เพื่อนำทางไปยังหน้าอื่น
+  const navigate = useNavigate()
   const [hats, setHats] = useState([]); // State to store hats
   const [loading, setLoading] = useState(true); // State to manage loading status
   const [showModal, setShowModal] = useState(false);
@@ -15,6 +15,19 @@ function Shop() {
   const userID = localStorage.getItem("userID"); // Get userID from localStorage
   const [userCoins, setUserCoins] = useState(localStorage.getItem("coin") || 0); // State for user coins
   const [showCoinsModal, setShowCoinsModal] = useState(false);
+
+  const [userHats, setUserHats] = useState([]); // State for user hats
+
+  useEffect(() => {
+    const fetchUserHats = async () => {
+      const response = await API_GET(`userHats/${userID}`);
+      if (response.result) {
+        setUserHats(response.data.map(hat => hat.hatID)); // เก็บ hatID ที่ผู้ใช้มี
+      }
+    };
+
+    fetchUserHats();
+  }, [userID]);
 
   useEffect(() => {
     const fetchHats = async () => {
@@ -38,7 +51,7 @@ function Shop() {
     };
 
     fetchHats();
-  }, []); // Empty dependency array ensures this runs once on mount
+  }, []); 
 
   const handleBuyClick = (hat) => {
     setSelectedHat(hat);
@@ -49,43 +62,47 @@ function Shop() {
 
   const handleConfirmPurchase = async () => {
     if (!selectedHat) return;
-
+  
     // ตรวจสอบว่าเหรียญของผู้ใช้พอซื้อหรือไม่
     if (userCoins < selectedHat.hatCoin) {
       setShowCoinsModal(true); // แสดง modal เมื่อเหรียญไม่พอ
       setShowModal(false);
       return;
     }
-
+  
     // Step 1: Update User Coins
     const updateCoinsResponse = await API_POST("updateCoins", {
       userID,
       hatID: selectedHat.hatID, // ใช้ selectedHat.hatID เพื่อหักเหรียญ
     });
-
+  
     // Step 2: Insert Hat into User_Hat
     if (updateCoinsResponse.success) {
       const addUserHatResponse = await API_POST("addUserHat", {
         userID,
         hatID: selectedHat.hatID,
       });
-
+  
       if (addUserHatResponse.result) {
         alert("ซื้อสำเร็จ!"); // แสดงข้อความสำเร็จ
-
+  
         // อัพเดตเหรียญใน localStorage และ state ของเหรียญผู้ใช้
         const newCoinBalance = parseInt(userCoins) - selectedHat.hatCoin;
         localStorage.setItem("coin", newCoinBalance); // อัพเดต localStorage
         setUserCoins(newCoinBalance); // อัพเดต state
+  
+        // อัพเดต userHats state ทันที
+        setUserHats((prevHats) => [...prevHats, selectedHat.hatID]); // เพิ่ม hatID ที่ซื้อไปใน userHats
       } else {
         alert("การซื้อไม่สำเร็จ: " + addUserHatResponse.message);
       }
     } else {
       alert("การอัพเดตเหรียญไม่สำเร็จ: " + updateCoinsResponse.message);
     }
-
+  
     setShowModal(false); // ปิด modal หลังจากดำเนินการเสร็จสิ้น
   };
+  
 
   const handleCloseCoinsModal = () => setShowCoinsModal(false);
 
@@ -138,8 +155,9 @@ function Shop() {
                   <button
                     className="btn card-body text-center border-top fs-4 pt-3 pb-0"
                     onClick={() => handleBuyClick(hat)}
+                    disabled={userHats.includes(hat.hatID)} // ปิดการใช้งานปุ่มถ้าผู้ใช้มีสินค้านี้อยู่แล้ว
                   >
-                    ซื้อ
+                    {userHats.includes(hat.hatID) ? "ซื้อแล้ว" : "ซื้อ"} {/* แสดงชื่อปุ่ม */}
                   </button>
                 </div>
               </div>
@@ -186,7 +204,7 @@ function Shop() {
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={handleGoToShop}>
-            กลับไปหน้า Shop
+            กลับ
           </Button>
           <Button variant="primary" onClick={handleGoToAddCoin}>
             ไปหน้าเติมเงิน
@@ -198,3 +216,5 @@ function Shop() {
 }
 
 export default Shop;
+
+

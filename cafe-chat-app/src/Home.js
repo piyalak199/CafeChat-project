@@ -1,6 +1,6 @@
 import "bootstrap/dist/css/bootstrap.min.css";
 import React, { useState, useEffect } from "react";
-import { Link, Navigate, useParams } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { AiFillEdit } from "react-icons/ai";
 import { FaCirclePlay } from "react-icons/fa6";
 
@@ -11,6 +11,23 @@ import NavbarUser from "./NavbarUser.js";
 
 function Home() {
   const displayName = localStorage.getItem("displayName");
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Simulate data loading
+    const loadData = () => {
+      // Replace this with your actual data fetching logic
+      setTimeout(() => {
+        setLoading(false); // Data loading complete
+      },500); 
+    };
+
+    loadData();
+  }, []);
+
+  if (loading) {
+    return <h3 className="text-center">รอสักครู่นะคะ...</h3>; // You can also use a spinner here
+  }
 
   return (
     <div>
@@ -41,4 +58,5 @@ function Home() {
     </div>
   );
 }
+
 export default Home;
