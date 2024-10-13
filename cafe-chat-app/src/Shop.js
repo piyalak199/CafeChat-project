@@ -4,14 +4,17 @@ import React, { useEffect, useState } from "react";
 import NavbarUser from "./NavbarUser";
 import { API_GET, API_POST } from "./api"; // Import API_GET and API_POST
 import bgShop from "./img/Shop/bgShop.png";
+import { useNavigate } from "react-router-dom";
 
 function Shop() {
+  const navigate = useNavigate(); // ใช้ navigate เพื่อนำทางไปยังหน้าอื่น
   const [hats, setHats] = useState([]); // State to store hats
   const [loading, setLoading] = useState(true); // State to manage loading status
   const [showModal, setShowModal] = useState(false);
   const [selectedHat, setSelectedHat] = useState(null);
   const userID = localStorage.getItem("userID"); // Get userID from localStorage
   const [userCoins, setUserCoins] = useState(localStorage.getItem("coin") || 0); // State for user coins
+  const [showCoinsModal, setShowCoinsModal] = useState(false);
 
   useEffect(() => {
     const fetchHats = async () => {
@@ -47,37 +50,52 @@ function Shop() {
   const handleConfirmPurchase = async () => {
     if (!selectedHat) return;
 
+    // ตรวจสอบว่าเหรียญของผู้ใช้พอซื้อหรือไม่
+    if (userCoins < selectedHat.hatCoin) {
+      setShowCoinsModal(true); // แสดง modal เมื่อเหรียญไม่พอ
+      setShowModal(false);
+      return;
+    }
+
     // Step 1: Update User Coins
-    const updateCoinsResponse = await API_POST('updateCoins', {
+    const updateCoinsResponse = await API_POST("updateCoins", {
       userID,
-      hatID: selectedHat.hatID, // Use selectedHat.hatID to deduct coins
+      hatID: selectedHat.hatID, // ใช้ selectedHat.hatID เพื่อหักเหรียญ
     });
 
     // Step 2: Insert Hat into User_Hat
     if (updateCoinsResponse.success) {
-      const addUserHatResponse = await API_POST('addUserHat', {
+      const addUserHatResponse = await API_POST("addUserHat", {
         userID,
         hatID: selectedHat.hatID,
       });
 
       if (addUserHatResponse.result) {
-        alert('ซื้อสำเร็จ!'); // Show success message
+        alert("ซื้อสำเร็จ!"); // แสดงข้อความสำเร็จ
 
-        // Update localStorage and state for user coins
+        // อัพเดตเหรียญใน localStorage และ state ของเหรียญผู้ใช้
         const newCoinBalance = parseInt(userCoins) - selectedHat.hatCoin;
-        localStorage.setItem("coin", newCoinBalance); // Update localStorage
-        setUserCoins(newCoinBalance); // Update state
-
-        // Optionally, you can update the NavbarUser component here if needed
-        // You could use a context or prop drilling to pass the updated coins if NavbarUser is within the same hierarchy
+        localStorage.setItem("coin", newCoinBalance); // อัพเดต localStorage
+        setUserCoins(newCoinBalance); // อัพเดต state
       } else {
-        alert('การซื้อไม่สำเร็จ: ' + addUserHatResponse.message);
+        alert("การซื้อไม่สำเร็จ: " + addUserHatResponse.message);
       }
     } else {
-      alert('การอัพเดตเหรียญไม่สำเร็จ: ' + updateCoinsResponse.message);
+      alert("การอัพเดตเหรียญไม่สำเร็จ: " + updateCoinsResponse.message);
     }
 
-    setShowModal(false); // Close modal after purchase
+    setShowModal(false); // ปิด modal หลังจากดำเนินการเสร็จสิ้น
+  };
+
+  const handleCloseCoinsModal = () => setShowCoinsModal(false);
+
+  const handleGoToShop = () => {
+    setShowCoinsModal(false); // ปิด Modal ก่อน
+  };
+
+  const handleGoToAddCoin = () => {
+    setShowCoinsModal(false); // ปิด Modal ก่อน
+    navigate("/addcoin"); // นำทางไปที่หน้า /addcoin
   };
 
   if (loading) {
@@ -87,15 +105,17 @@ function Shop() {
   return (
     <div>
       <div className="container absolute inset-x-0 top-0">
-        <NavbarUser coins={userCoins} /> {/* Pass userCoins to NavbarUser if needed */}
-
+        <NavbarUser coins={userCoins} />
         {/* Row 1: Avatar and Shop Name */}
         <h className="row mb-4">
           <div className="col text-center">
-            <img src={bgShop} alt="Shop Background" className="img-fluid w-100 px-48" />
+            <img
+              src={bgShop}
+              alt="Shop Background"
+              className="img-fluid w-100 px-48"
+            />
           </div>
         </h>
-
         {/* Row 2: Category Buttons */}
         <div className="row mb-4 px-36">
           <div className="col ">
@@ -103,7 +123,6 @@ function Shop() {
             <button className="btn btn-primary mx-2 w-32">เสื้อผ้า</button>
           </div>
         </div>
-
         {/* Row 3: List of Hats */}
         <div className="card p-4 mx-32 mb-4">
           <div className="row ">
@@ -153,6 +172,24 @@ function Shop() {
           </Button>
           <Button variant="primary" onClick={handleConfirmPurchase}>
             ยืนยันการซื้อ
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      {/* Modal for  coins */}
+      <Modal show={showCoinsModal} onHide={handleCloseCoinsModal}>
+        <Modal.Header closeButton>
+          <Modal.Title>เหรียญไม่เพียงพอ</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <p>Coin หรือเหรียญสะสมของคุณไม่เพียงพอสำหรับสินค้านี้!!</p>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleGoToShop}>
+            กลับไปหน้า Shop
+          </Button>
+          <Button variant="primary" onClick={handleGoToAddCoin}>
+            ไปหน้าเติมเงิน
           </Button>
         </Modal.Footer>
       </Modal>
