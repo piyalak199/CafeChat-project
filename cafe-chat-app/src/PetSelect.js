@@ -20,7 +20,7 @@ function PetSelect() {
 
         // Fetch current user's petTypeID
         const userResponse = await API_GET(`user/${userID}`);
-        setCurrentPetTypeID(userResponse.data.petTypeID); // Assuming the response contains petTypeID
+        setCurrentPetTypeID(userResponse.data.petTypeID);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -33,7 +33,7 @@ function PetSelect() {
   const handlePetTypeChange = async (newPetTypeID) => {
     if (currentPetTypeID === newPetTypeID) {
       console.log("This pet type is already selected.");
-      return; // Do nothing if the pet type is already selected
+      return;
     }
 
     try {
@@ -46,7 +46,7 @@ function PetSelect() {
 
       // Update local storage and state
       localStorage.setItem("petTypeID", newPetTypeID);
-      setCurrentPetTypeID(newPetTypeID); // Update state to reflect the change
+      setCurrentPetTypeID(newPetTypeID); 
     } catch (error) {
       console.error("Error updating pet type:", error);
     }

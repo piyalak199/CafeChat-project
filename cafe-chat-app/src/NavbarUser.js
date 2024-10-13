@@ -1,6 +1,5 @@
 import "bootstrap/dist/css/bootstrap.min.css";
 import React, { useState} from "react";
-// import {  } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
 import { IoIosNotifications } from "react-icons/io";
 import { BsPersonFill } from "react-icons/bs";
@@ -27,7 +26,6 @@ const NavbarUser = () => {
   const handleIconClick = () => {
     setShowLogout(!showLogout); // สลับการแสดงปุ่มออกจากระบบ
   };
-  
 
   return (
     <div>

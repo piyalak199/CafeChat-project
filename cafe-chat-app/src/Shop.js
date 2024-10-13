@@ -11,6 +11,7 @@ function Shop() {
   const [showModal, setShowModal] = useState(false);
   const [selectedHat, setSelectedHat] = useState(null);
   const userID = localStorage.getItem("userID"); // Get userID from localStorage
+  const [userCoins, setUserCoins] = useState(localStorage.getItem("coin") || 0); // State for user coins
 
   useEffect(() => {
     const fetchHats = async () => {
@@ -61,6 +62,14 @@ function Shop() {
 
       if (addUserHatResponse.result) {
         alert('ซื้อสำเร็จ!'); // Show success message
+
+        // Update localStorage and state for user coins
+        const newCoinBalance = parseInt(userCoins) - selectedHat.hatCoin;
+        localStorage.setItem("coin", newCoinBalance); // Update localStorage
+        setUserCoins(newCoinBalance); // Update state
+
+        // Optionally, you can update the NavbarUser component here if needed
+        // You could use a context or prop drilling to pass the updated coins if NavbarUser is within the same hierarchy
       } else {
         alert('การซื้อไม่สำเร็จ: ' + addUserHatResponse.message);
       }
@@ -78,7 +87,7 @@ function Shop() {
   return (
     <div>
       <div className="container absolute inset-x-0 top-0">
-        <NavbarUser />
+        <NavbarUser coins={userCoins} /> {/* Pass userCoins to NavbarUser if needed */}
 
         {/* Row 1: Avatar and Shop Name */}
         <h className="row mb-4">
