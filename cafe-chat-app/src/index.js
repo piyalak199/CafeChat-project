@@ -13,7 +13,8 @@ import ChatRoom from "./ChatRoom";
 import PetSelect from "./PetSelect";
 import App from "./App";
 import CheckAuth from "./CheckAuth";
-import Shop from "./Shop";
+import ShopHat from "./ShopHat";
+import ShopCloth from "./ShopCloth";
 
 // Create a router with different paths
 const router = createBrowserRouter([
@@ -21,7 +22,8 @@ const router = createBrowserRouter([
   { path: "/login", element: <Login /> },
   { path: "/signup", element: <Signup /> },
   { path: "/dressup", element: (<CheckAuth><DressUp /></CheckAuth>) },
-  { path: "/shop", element: (<CheckAuth><Shop /></CheckAuth>) },
+  { path: "/shophat", element: (<CheckAuth><ShopHat /></CheckAuth>) },
+  { path: "/shopcloth", element: (<CheckAuth><ShopCloth /></CheckAuth>) },
   { path: "/home", element: (<CheckAuth><Home /></CheckAuth>) },
   { path: "/chatroom", element: (<CheckAuth><ChatRoom /></CheckAuth>)},
   { path: "/chatroom/:roomID", element:(<CheckAuth>< ChatRoom/></CheckAuth>)},

@@ -5,22 +5,27 @@ import NavbarUser from "./NavbarUser.js";
 import "./PetSelect.css";
 
 function PetSelect() {
-  const userID = localStorage.getItem("userID"); // Ensure you're using userID here
-  const petUserID = localStorage.getItem("petTypeID"); // จะนำไปใช้ได้ เช่น ปุ่มที่แสดงว่า userID นี้มีข้อมูล petTypeID ใดอยู่ใน database
+  const userID = localStorage.getItem("userID");
   const [petTypes, setPetTypes] = useState([]);
-  const [currentPetTypeID, setCurrentPetTypeID] = useState(petUserID); // State to hold current petTypeID
+  const [currentPetTypeID, setCurrentPetTypeID] = useState(null); // เริ่มต้นเป็น null
 
-  // Fetch pet types and current user's petTypeID
+  // ดึงข้อมูล pet types และ petTypeID ของผู้ใช้
   useEffect(() => {
     const fetchPetTypes = async () => {
+      
       try {
-        // Fetch pet types
-        const response = await API_GET("pettype");
-        setPetTypes(response.data);
+        // ดึงข้อมูล pet types
+        const petTypesResponse = await API_GET("pettype");
+        setPetTypes(petTypesResponse.data); // เก็บ pet types ที่ดึงมา
 
-        // Fetch current user's petTypeID
+        // ดึง petTypeID ของผู้ใช้
         const userResponse = await API_GET(`user/${userID}`);
-        setCurrentPetTypeID(userResponse.data.petTypeID);
+        if (userResponse.data && userResponse.data.petTypeID) {
+          const userPetTypeID = userResponse.data.petTypeID;
+          setCurrentPetTypeID(userPetTypeID); // ตั้งค่า pet type ID ที่ถูกเลือก
+          localStorage.setItem("petTypeID", userPetTypeID); // อัปเดต local storage
+
+        }
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -29,24 +34,24 @@ function PetSelect() {
     fetchPetTypes();
   }, [userID]);
 
-  // Function to handle button click
+  // ฟังก์ชันจัดการการเปลี่ยน pet type
   const handlePetTypeChange = async (newPetTypeID) => {
     if (currentPetTypeID === newPetTypeID) {
-      console.log("This pet type is already selected.");
-      return;
+      console.log("เลือก pet type นี้อยู่แล้ว");
+      return; // ถ้าเลือกแล้วไม่ต้องเปลี่ยน
     }
 
     try {
-      // Update pet type in the database
+      // อัปเดต pet type ในฐานข้อมูล
       const response = await API_POST("updatePetType", {
         userID: userID,
         petTypeID: newPetTypeID,
       });
-      console.log("Pet type updated:", response.message);
+      console.log("อัปเดต pet type:", response.message);
 
-      // Update local storage and state
+      // อัปเดต local storage และ state
       localStorage.setItem("petTypeID", newPetTypeID);
-      setCurrentPetTypeID(newPetTypeID); 
+      setCurrentPetTypeID(newPetTypeID); // อัปเดต state
     } catch (error) {
       console.error("Error updating pet type:", error);
     }
@@ -67,18 +72,14 @@ function PetSelect() {
 
               <button
                 type="button"
-                className={`btn btn-selectpet m-2 ${
-                  currentPetTypeID === pet.petTypeID
-                    ? "btn-current "
-                    : "btn-default "
-                }`}
+                className="btn btn-selectpet m-2"
                 onClick={() => handlePetTypeChange(pet.petTypeID)}
+               
+                disabled={currentPetTypeID === pet.petTypeID} // ปิดการใช้งานถ้าตรงกับ pet type ที่เลือก
               >
-                {pet.petName}
+                {currentPetTypeID === pet.petTypeID ? 'เลือกอยู่' : pet.petName}
               </button>
             </div>
-         
-
           </div>
         ))}
       </div>

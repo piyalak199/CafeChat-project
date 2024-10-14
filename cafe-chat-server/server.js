@@ -379,15 +379,50 @@ app.get("/chatroom/:chatroomId", async (req, res) => {
   }
 });
 
+// // Get all pet types
+// app.get("/api/pettype", checkAuth, (req, res) => {
+//   const query = "SELECT * FROM pettype";
+
+//   pool.query(query, (error, results) => {
+//     if (error) {
+//       return res.json({
+//         result: false,
+//         message: error.message,
+//       });
+//     }
+//     res.json({
+//       result: true,
+//       data: results,
+//     });
+//   });
+// });
+
+// // Route to update the user's pet type
+// app.post("/api/updatePetType", checkAuth, (req, res) => {
+//   const { userID, petTypeID } = req.body;
+//   const sql = "UPDATE user SET petTypeID = ? WHERE userID = ?";
+
+//   pool.query(sql, [petTypeID, userID], (err, result) => {
+//     if (err) {
+//       return res.status(500).send({ message: "Error updating pet type" });
+//     }
+//     if (result.affectedRows === 0) {
+//       return res.status(404).send({ message: "User not found" });
+//     }
+//     res.send({ message: "Pet type updated successfully" });
+//   });
+// });
+
+
 // Get all pet types
 app.get("/api/pettype", checkAuth, (req, res) => {
   const query = "SELECT * FROM pettype";
 
   pool.query(query, (error, results) => {
     if (error) {
-      return res.json({
+      return res.status(500).json({ // Use 500 status code for server errors
         result: false,
-        message: error.message,
+        message: "Error fetching pet types: " + error.message,
       });
     }
     res.json({
@@ -400,17 +435,26 @@ app.get("/api/pettype", checkAuth, (req, res) => {
 // Route to update the user's pet type
 app.post("/api/updatePetType", checkAuth, (req, res) => {
   const { userID, petTypeID } = req.body;
-  const sql = "UPDATE users SET petTypeID = ? WHERE userID = ?";
+
+  // Validate input
+  if (!userID || !petTypeID) {
+    return res.status(400).send({ message: "userID and petTypeID are required" });
+  }
+
+  const sql = "UPDATE user SET petTypeID = ? WHERE userID = ?";
 
   pool.query(sql, [petTypeID, userID], (err, result) => {
     if (err) {
-      return res.status(500).send({ message: "Error updating pet type" });
+      return res.status(500).send({ message: "Error updating pet type: " + err.message });
     }
     if (result.affectedRows === 0) {
       return res.status(404).send({ message: "User not found" });
     }
     res.send({ message: "Pet type updated successfully" });
   });
+
+  
+  
 });
 
 // สมมติว่ามีฟังก์ชัน getHatID ในโมดูล Hat
@@ -449,7 +493,7 @@ app.get("/api/hats/:hatID", checkAuth, async (req, res) => {
   }
 });
 
-app.post("/api/updateCoins", async (req, res) => {
+app.post("/api/updateCoins", checkAuth, async (req, res) => {
   const { hatID, userID } = req.body;
 
   try {
@@ -464,7 +508,7 @@ app.post("/api/updateCoins", async (req, res) => {
 });
 
 // Endpoint to add a hat to the user_hat table
-app.post("/api/addUserHat", async (req, res) => {
+app.post("/api/addUserHat", checkAuth,async (req, res) => {
   const input = req.body;
 
   try {
@@ -485,6 +529,95 @@ app.post("/api/addUserHat", async (req, res) => {
 app.get("/api/userHats/:userID", async (req, res) => {
   const userID = req.params.userID;
   const sql = "SELECT hatID FROM user_hat WHERE userID = ?";
+
+  pool.query(sql, [userID], (error, results) => {
+    if (error) {
+      res.json({
+        result: false,
+        message: error.message,
+      });
+    } else {
+      res.json({
+        result: true,
+        data: results,
+      });
+    }
+  });
+});
+
+
+// สมมติว่ามีฟังก์ชัน getHatID ในโมดูล Hat
+app.get("/api/cloth/:clothID", async (req, res) => {
+  const clothID = req.params.clothID;
+  const sql = "SELECT * FROM cloth ";
+
+  if (clothID == 0) {
+    pool.query(sql, (error, results) => {
+      if (error) {
+        res.json({
+          result: false,
+          message: error.message,
+        });
+      } else {
+        res.json({
+          result: true,
+          data: results,
+        });
+      }
+    });
+  } else {
+    pool.query(sql + "WHERE clothID = ?", [clothID], (error, results) => {
+      if (error) {
+        res.json({
+          result: false,
+          message: error.message,
+        });
+      } else {
+        res.json({
+          result: true,
+          data: results,
+        });
+      }
+    });
+  }
+});
+
+app.post("/api/updateCoinsCloth", async (req, res) => {
+  const { clothID, userID } = req.body;
+
+  try {
+    const result = await User.updateCoinsCloth(pool, clothID, userID);
+
+    // ตรวจสอบว่ามีการเปลี่ยนแปลงหรือไม่
+    res.json({ success: true, message: "Coins updated successfully!" });
+  } catch (error) {
+    console.error("Error updating coins:", error);
+    res.status(500).json({ success: false, message: "Internal server error." });
+  }
+});
+
+// Endpoint to add a hat to the user_hat table
+app.post("/api/addUserCloth",async (req, res) => {
+  const input = req.body;
+
+  try {
+    // Call a method to insert a new user hat, ensure to create this method in your User model
+    var result = await User.addUserCloth(pool, input.userID, input.clothID);
+
+    res.json({
+      result: true,
+    });
+  } catch (ex) {
+    res.json({
+      result: false,
+      message: ex.message,
+    });
+  }
+});
+
+app.get("/api/usercloth/:userID", async (req, res) => {
+  const userID = req.params.userID;
+  const sql = "SELECT clothID FROM user_cloth WHERE userID = ?";
 
   pool.query(sql, [userID], (error, results) => {
     if (error) {

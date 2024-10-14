@@ -4,10 +4,14 @@ import React, { useEffect, useState } from "react";
 import NavbarUser from "./NavbarUser";
 import { API_GET, API_POST } from "./api"; // Import API_GET and API_POST
 import bgShop from "./img/Shop/bgShop.png";
+import modelAvatar from "./img//Shop/model.png";
+import coinicon from "./img/Shop/coin.png";
 import { useNavigate } from "react-router-dom";
 
-function Shop() {
-  const navigate = useNavigate()
+import "./ShopHat.css";
+
+function ShopHat() {
+  const navigate = useNavigate();
   const [hats, setHats] = useState([]); // State to store hats
   const [loading, setLoading] = useState(true); // State to manage loading status
   const [showModal, setShowModal] = useState(false);
@@ -22,7 +26,7 @@ function Shop() {
     const fetchUserHats = async () => {
       const response = await API_GET(`userHats/${userID}`);
       if (response.result) {
-        setUserHats(response.data.map(hat => hat.hatID)); // เก็บ hatID ที่ผู้ใช้มี
+        setUserHats(response.data.map((hat) => hat.hatID)); // เก็บ hatID ที่ผู้ใช้มี
       }
     };
 
@@ -51,7 +55,7 @@ function Shop() {
     };
 
     fetchHats();
-  }, []); 
+  }, []);
 
   const handleBuyClick = (hat) => {
     setSelectedHat(hat);
@@ -62,35 +66,35 @@ function Shop() {
 
   const handleConfirmPurchase = async () => {
     if (!selectedHat) return;
-  
+
     // ตรวจสอบว่าเหรียญของผู้ใช้พอซื้อหรือไม่
     if (userCoins < selectedHat.hatCoin) {
       setShowCoinsModal(true); // แสดง modal เมื่อเหรียญไม่พอ
       setShowModal(false);
       return;
     }
-  
+
     // Step 1: Update User Coins
     const updateCoinsResponse = await API_POST("updateCoins", {
       userID,
       hatID: selectedHat.hatID, // ใช้ selectedHat.hatID เพื่อหักเหรียญ
     });
-  
+
     // Step 2: Insert Hat into User_Hat
     if (updateCoinsResponse.success) {
       const addUserHatResponse = await API_POST("addUserHat", {
         userID,
         hatID: selectedHat.hatID,
       });
-  
+
       if (addUserHatResponse.result) {
         alert("ซื้อสำเร็จ!"); // แสดงข้อความสำเร็จ
-  
+
         // อัพเดตเหรียญใน localStorage และ state ของเหรียญผู้ใช้
         const newCoinBalance = parseInt(userCoins) - selectedHat.hatCoin;
         localStorage.setItem("coin", newCoinBalance); // อัพเดต localStorage
         setUserCoins(newCoinBalance); // อัพเดต state
-  
+
         // อัพเดต userHats state ทันที
         setUserHats((prevHats) => [...prevHats, selectedHat.hatID]); // เพิ่ม hatID ที่ซื้อไปใน userHats
       } else {
@@ -99,10 +103,9 @@ function Shop() {
     } else {
       alert("การอัพเดตเหรียญไม่สำเร็จ: " + updateCoinsResponse.message);
     }
-  
+
     setShowModal(false); // ปิด modal หลังจากดำเนินการเสร็จสิ้น
   };
-  
 
   const handleCloseCoinsModal = () => setShowCoinsModal(false);
 
@@ -136,8 +139,10 @@ function Shop() {
         {/* Row 2: Category Buttons */}
         <div className="row mb-4 px-36">
           <div className="col ">
-            <button className="btn btn-primary mx-2 w-32">หมวก</button>
-            <button className="btn btn-primary mx-2 w-32">เสื้อผ้า</button>
+            <button className="btn btn-primary mx-2 w-32 " disabled>
+              หมวก
+            </button>
+            <button className="btn btn-primary mx-2 w-32" onClick={() => navigate("/shopcloth")} > เสื้อผ้า</button>
           </div>
         </div>
         {/* Row 3: List of Hats */}
@@ -145,19 +150,36 @@ function Shop() {
           <div className="row ">
             {hats.map((hat) => (
               <div key={hat.hatID} className="col-md-4">
-                <div className="card ">
-                  <h2 className="card-text m-0">Coin: {hat.hatCoin}</h2>
-                  <img
-                    src={`http://localhost:3001/img/hat/${hat.hatImg}`}
-                    alt={hat.hatName}
-                    className="card-img-top px-5 py-0"
-                  />
+                <div className="card m-2">
+                  <h2 className="card-coin m-0">
+                    <div className="d-flex align-items-center m-2 w-10">
+                      <img src={coinicon} alt="Coin" className="mr-2" />
+                      <span>{hat.hatCoin}</span>
+                    </div>
+                  </h2>
+
+                  <div className="avatar-container">
+                    {/* Model Avatar */}
+                    <img
+                      src={modelAvatar}
+                      alt="Model Avatar"
+                      className="avatar-image"
+                    />
+                    {/* Hat Item */}
+                    <img
+                      src={`http://localhost:3001/img/hat/${hat.hatImg}`}
+                      alt="Hat"
+                      className="hat-image"
+                    />
+                  </div>
+
                   <button
                     className="btn card-body text-center border-top fs-4 pt-3 pb-0"
                     onClick={() => handleBuyClick(hat)}
                     disabled={userHats.includes(hat.hatID)} // ปิดการใช้งานปุ่มถ้าผู้ใช้มีสินค้านี้อยู่แล้ว
                   >
-                    {userHats.includes(hat.hatID) ? "ซื้อแล้ว" : "ซื้อ"} {/* แสดงชื่อปุ่ม */}
+                    {userHats.includes(hat.hatID) ? "ซื้อแล้ว" : "ซื้อ"}
+                    {/* แสดงชื่อปุ่ม */}
                   </button>
                 </div>
               </div>
@@ -173,15 +195,25 @@ function Shop() {
         </Modal.Header>
         <Modal.Body>
           {selectedHat && (
-            <>
+            <div>
               <h5>คุณต้องการซื้อ {selectedHat.hatName} หรือไม่?</h5>
               <p>ราคา: {selectedHat.hatCoin} Coins</p>
-              <img
-                src={`http://localhost:3001/img/hat/${selectedHat.hatImg}`}
-                alt={selectedHat.hatName}
-                className="img-fluid"
-              />
-            </>
+
+              <div className="avatar-container">
+                {/* Model Avatar */}
+                <img
+                  src={modelAvatar}
+                  alt="Model Avatar"
+                  className="avatar-image"
+                />
+                {/* Hat Item */}
+                <img
+                  src={`http://localhost:3001/img/hat/${selectedHat.hatImg}`}
+                  alt={selectedHat}
+                  className="hat-image"
+                />
+              </div>
+            </div>
           )}
         </Modal.Body>
         <Modal.Footer>
@@ -194,20 +226,21 @@ function Shop() {
         </Modal.Footer>
       </Modal>
 
-      {/* Modal for  coins */}
+      {/* Modal for coins */}
       <Modal show={showCoinsModal} onHide={handleCloseCoinsModal}>
         <Modal.Header closeButton>
-          <Modal.Title>เหรียญไม่เพียงพอ</Modal.Title>
+          <Modal.Title>เหรียญไม่เพียงพอ !!!</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <p>Coin หรือเหรียญสะสมของคุณไม่เพียงพอสำหรับสินค้านี้!!</p>
+          <p>จำนวน Coin หรือเหรียญสะสมของคุณ ไม่เพียงพอสำหรับสินค้านี้ !!</p>
+          <h5>คุณต้องการเติมเงินเพื่อเพิ่ม Coin หรือไม่ ? </h5>
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={handleGoToShop}>
             กลับ
           </Button>
           <Button variant="primary" onClick={handleGoToAddCoin}>
-            ไปหน้าเติมเงิน
+            ต้องการเติมเงิน
           </Button>
         </Modal.Footer>
       </Modal>
@@ -215,6 +248,4 @@ function Shop() {
   );
 }
 
-export default Shop;
-
-
+export default ShopHat;

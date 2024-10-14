@@ -33,5 +33,27 @@
 # }
 
 
-GET http://localhost:3001/userHats/1
+# GET http://localhost:3001/userCloth/2
+
+# GET http://localhost:3001/cloth/1
+
+
+# POST http://localhost:3001/updateCoinsCloth HTTP/1.1
+# Content-Type: application/json
+
+# {
+#     "clothID": 2,
+#     "userID": 1
+# }
+
+# POST http://localhost:3001/addUserCloth HTTP/1.1
+# Content-Type: application/json
+
+# {
+#     "clothID": 1,
+#     "userID": 1
+# }
+
+
+# GET http://localhost:3001/userHats/1
 

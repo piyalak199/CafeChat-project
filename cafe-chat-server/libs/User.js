@@ -70,4 +70,26 @@ module.exports = {
 
     return await pool.query(sql);
   },
+
+  addUserCloth: async (pool, userID, clothID) => {
+    var sql =
+      'INSERT INTO user_cloth (userID, clothID, cloth_active) VALUES (?, ?, "n")';
+    sql = mysql.format(sql, [userID, clothID]);
+
+    return await pool.query(sql);
+  },
+
+  updateCoinsCloth: async (pool, clothID, userID) => {
+    var sql =
+      "UPDATE user u " +
+      " JOIN cloth c ON c.clothID = ? " +
+      " SET u.coin = u.coin - c.clothCoin " +
+      " WHERE u.userID = ? ";
+
+    sql = mysql.format(sql, [clothID, userID]);
+
+    return await pool.query(sql);
+  },
+
+
 };

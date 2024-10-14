@@ -1,18 +1,19 @@
 .btn-selectpet {
   border: 1px solid #000;
   width: 100px;
-}
-.btn-current {
-  background-color:#c35650; /* เปลี่ยนเป็นสีที่คุณต้องการ */
-  color: white;
-}
-
-.btn-default {
   background-color: rgb(255, 255, 255); /* เปลี่ยนเป็นสีที่คุณต้องการ */
   color: rgb(0, 0, 0);
 }
 
 .btn-selectpet:hover {
-  border : 2px solid #c35650;
+  border : 3px solid #c35650;
   color: #c35650;
 }
+
+
+.btn-selectpet:disabled {
+  background-color: #cccccc; /* Light gray for disabled state */
+  color: #666666; /* Darker gray for text */
+  cursor: not-allowed; /* Change cursor to indicate it's not clickable */
+}
+

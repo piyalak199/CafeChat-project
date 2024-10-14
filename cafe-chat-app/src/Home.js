@@ -14,15 +14,7 @@ function Home() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Simulate data loading
-    const loadData = () => {
-      // Replace this with your actual data fetching logic
-      setTimeout(() => {
-        setLoading(false); // Data loading complete
-      },500); 
-    };
-
-    loadData();
+      setLoading(false); // Data loading complete
   }, []);
 
   if (loading) {
@@ -38,7 +30,7 @@ function Home() {
             แต่งตัว
           </Link>
         </div>
-        <Link className="button-shop" to="/shop">
+        <Link className="button-shop" to="/shophat">
           ร้านค้า
         </Link>
         <Link className="button-pet" to="/petselect">
