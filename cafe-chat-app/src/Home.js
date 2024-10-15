@@ -14,7 +14,15 @@ function Home() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-      setLoading(false); // Data loading complete
+    // Simulate data loading
+    const loadData = () => {
+      // Replace this with your actual data fetching logic
+      setTimeout(() => {
+        setLoading(false); // Data loading complete
+      },1000); 
+    };
+
+    loadData();
   }, []);
 
   if (loading) {
