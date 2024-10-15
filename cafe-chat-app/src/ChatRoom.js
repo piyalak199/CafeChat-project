@@ -1,37 +1,35 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Link, Navigate, useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { io } from "socket.io-client";
 
-import "./ChatRoom.css"; // Assuming you have this file for styling
+import "./ChatRoom.css";
 import NavbarUser from "./NavbarUser.js";
 
-const socket = io.connect("http://localhost:3001");
-
-export default function RoomPage() {
+export default function ChatRoom() {
   const displayName = localStorage.getItem("displayName");
-  const username = localStorage.getItem("username");
-
-  const { roomID } = useParams(); // Use roomID from the URL
+  const { roomID } = useParams();
   const navigate = useNavigate();
   const [chatRooms, setChatRooms] = useState([]);
   const [currentRoom, setCurrentRoom] = useState(null);
-  const [currentRoomName, setCurrentRoomName] = useState(null); // State for room name
+  const [currentRoomName, setCurrentRoomName] = useState(null);
   const [joinedRoom, setJoinedRoom] = useState(false);
-  const [messages, setMessages] = useState([]); // State to hold chat messages
-  const [messageInput, setMessageInput] = useState(""); // State for input field
+  const [messages, setMessages] = useState([]);
+  const [messageInput, setMessageInput] = useState("");
   const [userName, setUserName] = useState(displayName);
-  const messagesEndRef = useRef(null); // สร้าง ref เพื่อใช้เลื่อนลง
+  const [usersInRoom, setUsersInRoom] = useState([]); // เก็บรายชื่อผู้ใช้ในห้อง
+  const messagesEndRef = useRef(null);
+  const [socket, setSocket] = useState(null);
 
   const scrollToBottom = () => {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({
         behavior: "smooth",
-      }); // เลื่อนไปที่ข้อความสุดท้าย
+      });
     }
   };
 
   useEffect(() => {
-    scrollToBottom(); // เรียกใช้ทุกครั้งที่ messages มีการอัปเดต
+    scrollToBottom();
   }, [messages]);
 
   useEffect(() => {
@@ -41,67 +39,80 @@ export default function RoomPage() {
       .then((data) => setChatRooms(data))
       .catch((error) => console.error("Error fetching chat rooms:", error));
 
-    if (roomID) {
-      // Join the room when roomID is available
-      socket.emit("joinRoom", roomID);
-      setCurrentRoom(roomID);
-      setJoinedRoom(true);
-
-      // Listen for incoming messages
-      socket.on("message", (message) => {
-        setMessages((prevMessages) => [
-          ...prevMessages,
-          { sender: message.sender, text: message.text },
-        ]);
-      });
-    }
-
     return () => {
-      if (currentRoom) {
-        socket.emit("leaveRoom", currentRoom);
-        setJoinedRoom(false);
+      if (socket) {
+        socket.disconnect();
       }
-      socket.off("message"); // Clean up socket listeners
     };
-  }, [roomID]);
+  }, [socket]);
 
   const handleJoinRoom = (room) => {
     if (currentRoom) {
-      // Leave the current room before joining a new one
-      socket.emit("leaveRoom", currentRoom);
-      setJoinedRoom(false);
+      if (socket) {
+        socket.emit("leaveRoom", {
+          roomID: currentRoom,
+          displayName: userName,
+        });
+        setJoinedRoom(false);
+        socket.disconnect();
+      }
     }
 
-    // Join the new room and set room name
-    socket.emit("joinRoom", room.roomID);
+    const newSocket = io.connect("http://localhost:3001");
+    setSocket(newSocket);
+
+    // Join the new room and notify others
+    newSocket.emit("joinRoom", { roomID: room.roomID, displayName: userName });
+
     setCurrentRoom(room.roomID);
-    setCurrentRoomName(room.roomName); // Set the room name
+    setCurrentRoomName(room.roomName);
     setJoinedRoom(true);
-    setMessages([]); // Clear messages when joining a new room
+    setMessages([]);
+
+    // Listen for incoming messages
+    newSocket.on("message", (message) => {
+      setMessages((prevMessages) => [
+        ...prevMessages,
+        { sender: message.sender, text: message.text },
+      ]);
+    });
+
+    // Listen for updated user list in the room
+    newSocket.on("updateUsersInRoom", (users) => {
+      setUsersInRoom(users); // อัปเดตรายชื่อผู้ใช้ในห้อง
+    });
+
     navigate(`/chatroom/${room.roomID}`);
   };
 
   const handleLeaveRoom = () => {
     if (currentRoom) {
-      socket.emit("leaveRoom", currentRoom);
+      if (socket) {
+        socket.emit("leaveRoom", {
+          roomID: currentRoom,
+          displayName: userName,
+        });
+        socket.disconnect();
+      }
       setCurrentRoom(null);
-      setCurrentRoomName(null); // Clear room name
+      setCurrentRoomName(null);
       setJoinedRoom(false);
       setMessages([]);
+      setUsersInRoom([]); // เคลียร์รายชื่อผู้ใช้
       navigate("/chatroom");
     }
   };
 
   const handleSendMessage = () => {
-    if (messageInput.trim() !== "" && currentRoom) {
+    if (messageInput.trim() !== "" && currentRoom && socket) {
       const message = {
         room: currentRoom,
         sender: userName,
         text: messageInput,
       };
 
-      socket.emit("sendMessage", message); // Emit the message to the server
-      setMessageInput(""); // Clear the input field
+      socket.emit("sendMessage", message);
+      setMessageInput("");
     }
   };
 
@@ -111,19 +122,22 @@ export default function RoomPage() {
         <NavbarUser />
 
         <div className="flex justify-center">
-          <div class="border-b border-black h-32 w-full mx-40 mb-10 rounded-0">
+          <div className="border-b border-black h-32 w-full mx-40 mb-10 rounded-0">
             <div className="grid grid-cols-5 gap-2 ">
-              <div className="col-start-1 ">a</div>
-              <div className="col-start-2">b</div>
-              <div className="col-start-3">c</div>
-              <div className="col-start-4">d</div>
-              <div className="col-start-5">e</div>
+              {/* แสดงรายชื่อผู้ใช้ในห้อง */}
+              <div className="users-list">
+                <h4>Users in room:</h4>
+                <ul>
+                  {usersInRoom.map((user, index) => (
+                    <li key={index}>{user}</li>
+                  ))}
+                </ul>
+              </div>
             </div>
           </div>
         </div>
 
         <div className="grid grid-cols-5 gap-2 self-center mt-10 h-[32rem]">
-          {/* Chat Room List */}
           <div className="flex justify-center">
             <div className="items-center box-border h-full w-full mx-16 p-3 border border-black rounded-3xl">
               <div className="grid grid-flow-row auto-rows-max">
@@ -141,21 +155,20 @@ export default function RoomPage() {
             </div>
           </div>
 
-          {/* Chat Messages Section */}
           <div className="col-span-4 flex justify-center">
             <div className="box-border h-full w-full mr-16 p-4 border border-black rounded-3xl message-container">
               <div>
                 {joinedRoom ? (
                   <div>
-                    <div class="grid grid-rows-10 grid-col-1 gap-2">
-                      <div class="row-span-1 ">
+                    <div className="grid grid-rows-10 grid-col-1 gap-2">
+                      <div className="row-span-1">
                         <h2 className="row">
                           {currentRoomName
                             ? `Room: ${currentRoomName}`
                             : "Select a room to start chatting"}
                         </h2>
                       </div>
-                      <div class="row-start-2 row-end-10">
+                      <div className="row-start-2 row-end-10">
                         <div className="messages">
                           <div className="w-full h-80 overflow-auto touch-auto">
                             {messages.map((msg, index) => (
@@ -168,15 +181,13 @@ export default function RoomPage() {
                                 } mb-2`}
                               >
                                 <div className="text-right">
-                                  {" "}
-                                  {/* ใช้ text-right เมื่อเป็นข้อความของผู้ใช้ */}
                                   <div>
                                     <small
                                       className={`text-xs text-gray-600 ${
                                         msg.sender === userName
                                           ? "float-right"
                                           : "float-left"
-                                      }`} /* จัดให้ชื่ออยู่ขวาเมื่อเป็นของผู้ใช้ */
+                                      }`}
                                     >
                                       {msg.sender === userName
                                         ? "You"
@@ -199,9 +210,10 @@ export default function RoomPage() {
                           </div>
                         </div>
                       </div>
-                      <div class="row-start-10 row-end-10">
+
+                      <div className="row-start-10 row-end-10">
                         <div className="position-relative">
-                          <div className="input-group ">
+                          <div className="input-group">
                             <input
                               type="text"
                               value={messageInput}

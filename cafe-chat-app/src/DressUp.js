@@ -12,22 +12,14 @@ import homeicon from "./img/Home/homeicon.png";
 import coin from "./img/Login/coin.png";
 import NavbarUser from "./NavbarUser.js";
 
-
 export default function DressUp() {
-
   return (
-      <div className="container absolute inset-x-0 top-0">
-        
-        <NavbarUser/>
+    <div className="container absolute inset-x-0 top-0">
+      <NavbarUser />
 
-        <div className="pet-section ">
-          {/* <img src={getdress} className="getdress" alt="Word1" />
-          <img src={seller} className="seller" alt="Pets" />
-          <img src={framedress} className="framedress" alt="Word2" />
-          <img src={framedress} className="framedress2" alt="Word2" />
-          <img src={navysuit} className="navysuit" alt="Word3" />
-          <img src={bowsuit} className="bowsuit" alt="Word4" /> */}
-        </div>
+      <div className="pet-section ">
+        
       </div>
+    </div>
   );
 }

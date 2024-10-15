@@ -30,9 +30,67 @@ var pool = mysql.createPool({
 const server = app.listen(port, () => {
   console.log(`Server running at ${port}`);
 });
+// const { Server } = require("socket.io");
+// const io = new Server(server, {
+//   cors: {
+//     origin: "http://localhost:3000",
+//     methods: ["GET", "POST"],
+//   },
+// });
+
+// const roomUsers = {}; // เก็บรายชื่อผู้ใช้ในแต่ละห้อง
+
+// io.on("connection", (socket) => {
+//   console.log("A user connected:", socket.id);
+
+//   // Join a specific chat room
+//   socket.on("joinRoom", ({ roomID, displayName }) => {
+//     socket.join(roomID);
+
+//     // เพิ่มผู้ใช้ในห้องนั้น
+//     if (!roomUsers[roomID]) {
+//       roomUsers[roomID] = [];
+//     }
+//     roomUsers[roomID].push(displayName);
+
+//     // ส่งรายชื่อผู้ใช้ในห้องกลับไปยัง Client
+//     io.to(roomID).emit("updateUsersInRoom", roomUsers[roomID]);
+//     console.log(`${displayName} joined room ${roomID}`);
+//   });
+
+//   // Leave a specific chat room
+//   socket.on("leaveRoom", ({ roomID, displayName }) => {
+//     socket.leave(roomID);
+
+//     // ลบผู้ใช้ออกจากห้อง
+//     if (roomUsers[roomID]) {
+//       roomUsers[roomID] = roomUsers[roomID].filter(
+//         (user) => user !== displayName
+//       );
+//       if (roomUsers[roomID].length === 0) {
+//         delete roomUsers[roomID]; // ถ้าไม่มีผู้ใช้ในห้องแล้ว ให้ลบห้องออกจาก roomUsers
+//       }
+//     }
+
+//     // ส่งรายชื่อผู้ใช้ที่เหลือในห้องกลับไปยัง Client
+//     io.to(roomID).emit("updateUsersInRoom", roomUsers[roomID]);
+//     console.log(`${displayName} left room ${roomID}`);
+//   });
+
+//   // Handle incoming messages
+//   socket.on("sendMessage", (message) => {
+//     io.to(message.room).emit("message", {
+//       sender: message.sender,
+//       text: message.text,
+//     });
+//   });
+
+//   socket.on("disconnect", () => {
+//     console.log("A user disconnected:", socket.id);
+//   });
+// });
 
 const { Server } = require("socket.io");
-const { error } = require("console");
 const io = new Server(server, {
   cors: {
     origin: "http://localhost:3000",
@@ -40,33 +98,85 @@ const io = new Server(server, {
   },
 });
 
-// Socket.IO event handling
+const roomUsers = {}; // เก็บรายชื่อผู้ใช้ในแต่ละห้อง
+const userRooms = {}; // เก็บห้องที่ผู้ใช้แต่ละคนอยู่
+
 io.on("connection", (socket) => {
   console.log("A user connected:", socket.id);
 
   // Join a specific chat room
-  socket.on("joinRoom", (roomID) => {
+  socket.on("joinRoom", ({ roomID, displayName }) => {
     socket.join(roomID);
-    console.log(`User joined room ${roomID}`);
+
+    // เก็บห้องที่ผู้ใช้อยู่
+    userRooms[socket.id] = { roomID, displayName };
+
+    // เพิ่มผู้ใช้ในห้องนั้น
+    if (!roomUsers[roomID]) {
+      roomUsers[roomID] = [];
+    }
+    roomUsers[roomID].push(displayName);
+
+    // ส่งรายชื่อผู้ใช้ในห้องกลับไปยัง Client
+    io.to(roomID).emit("updateUsersInRoom", roomUsers[roomID]);
+    console.log(`${displayName} joined room ${roomID}`);
   });
 
   // Leave a specific chat room
-  socket.on("leaveRoom", (roomID) => {
+  socket.on("leaveRoom", ({ roomID, displayName }) => {
     socket.leave(roomID);
-    console.log(`User left room ${roomID}`);
-  });
 
-  // Handle sending messages to a specific room
-  socket.on("sendMessage", (message) => {
-    const { room, text, sender } = message;
-    if (room) {
-      io.to(room).emit("message", { text, sender });
-      console.log(` ${sender} send Message to room ${room}: ${text}`);
+    // ลบผู้ใช้ออกจากห้อง
+    if (roomUsers[roomID]) {
+      roomUsers[roomID] = roomUsers[roomID].filter(
+        (user) => user !== displayName
+      );
+      if (roomUsers[roomID].length === 0) {
+        delete roomUsers[roomID]; // ถ้าไม่มีผู้ใช้ในห้องแล้ว ให้ลบห้องออกจาก roomUsers
+      }
     }
+
+    // ส่งรายชื่อผู้ใช้ที่เหลือในห้องกลับไปยัง Client
+    io.to(roomID).emit("updateUsersInRoom", roomUsers[roomID]);
+    console.log(`${displayName} left room ${roomID}`);
   });
 
+  // Handle disconnect event
   socket.on("disconnect", () => {
     console.log("A user disconnected:", socket.id);
+
+    // ตรวจสอบว่าผู้ใช้มีห้องที่อยู่หรือไม่
+    const userRoom = userRooms[socket.id];
+    if (userRoom) {
+      const { roomID, displayName } = userRoom;
+
+      // เรียก leaveRoom เมื่อผู้ใช้ disconnect
+      socket.leave(roomID);
+
+      if (roomUsers[roomID]) {
+        roomUsers[roomID] = roomUsers[roomID].filter(
+          (user) => user !== displayName
+        );
+        if (roomUsers[roomID].length === 0) {
+          delete roomUsers[roomID]; // ถ้าไม่มีผู้ใช้ในห้องแล้ว ให้ลบห้องออกจาก roomUsers
+        }
+      }
+
+      // ส่งรายชื่อผู้ใช้ที่เหลือในห้องกลับไปยัง Client
+      io.to(roomID).emit("updateUsersInRoom", roomUsers[roomID]);
+      console.log(`${displayName} disconnected and left room ${roomID}`);
+    }
+
+    // ลบข้อมูลห้องของผู้ใช้ที่ตัดการเชื่อมต่อ
+    delete userRooms[socket.id];
+  });
+
+  // Handle incoming messages
+  socket.on("sendMessage", (message) => {
+    io.to(message.room).emit("message", {
+      sender: message.sender,
+      text: message.text,
+    });
   });
 });
 
@@ -379,48 +489,14 @@ app.get("/chatroom/:chatroomId", async (req, res) => {
   }
 });
 
-// // Get all pet types
-// app.get("/api/pettype", checkAuth, (req, res) => {
-//   const query = "SELECT * FROM pettype";
-
-//   pool.query(query, (error, results) => {
-//     if (error) {
-//       return res.json({
-//         result: false,
-//         message: error.message,
-//       });
-//     }
-//     res.json({
-//       result: true,
-//       data: results,
-//     });
-//   });
-// });
-
-// // Route to update the user's pet type
-// app.post("/api/updatePetType", checkAuth, (req, res) => {
-//   const { userID, petTypeID } = req.body;
-//   const sql = "UPDATE user SET petTypeID = ? WHERE userID = ?";
-
-//   pool.query(sql, [petTypeID, userID], (err, result) => {
-//     if (err) {
-//       return res.status(500).send({ message: "Error updating pet type" });
-//     }
-//     if (result.affectedRows === 0) {
-//       return res.status(404).send({ message: "User not found" });
-//     }
-//     res.send({ message: "Pet type updated successfully" });
-//   });
-// });
-
-
 // Get all pet types
 app.get("/api/pettype", checkAuth, (req, res) => {
   const query = "SELECT * FROM pettype";
 
   pool.query(query, (error, results) => {
     if (error) {
-      return res.status(500).json({ // Use 500 status code for server errors
+      return res.status(500).json({
+        // Use 500 status code for server errors
         result: false,
         message: "Error fetching pet types: " + error.message,
       });
@@ -438,23 +514,24 @@ app.post("/api/updatePetType", checkAuth, (req, res) => {
 
   // Validate input
   if (!userID || !petTypeID) {
-    return res.status(400).send({ message: "userID and petTypeID are required" });
+    return res
+      .status(400)
+      .send({ message: "userID and petTypeID are required" });
   }
 
   const sql = "UPDATE user SET petTypeID = ? WHERE userID = ?";
 
   pool.query(sql, [petTypeID, userID], (err, result) => {
     if (err) {
-      return res.status(500).send({ message: "Error updating pet type: " + err.message });
+      return res
+        .status(500)
+        .send({ message: "Error updating pet type: " + err.message });
     }
     if (result.affectedRows === 0) {
       return res.status(404).send({ message: "User not found" });
     }
     res.send({ message: "Pet type updated successfully" });
   });
-
-  
-  
 });
 
 // สมมติว่ามีฟังก์ชัน getHatID ในโมดูล Hat
@@ -508,7 +585,7 @@ app.post("/api/updateCoins", checkAuth, async (req, res) => {
 });
 
 // Endpoint to add a hat to the user_hat table
-app.post("/api/addUserHat", checkAuth,async (req, res) => {
+app.post("/api/addUserHat", checkAuth, async (req, res) => {
   const input = req.body;
 
   try {
@@ -544,7 +621,6 @@ app.get("/api/userHats/:userID", async (req, res) => {
     }
   });
 });
-
 
 // สมมติว่ามีฟังก์ชัน getHatID ในโมดูล Hat
 app.get("/api/cloth/:clothID", async (req, res) => {
@@ -597,7 +673,7 @@ app.post("/api/updateCoinsCloth", async (req, res) => {
 });
 
 // Endpoint to add a hat to the user_hat table
-app.post("/api/addUserCloth",async (req, res) => {
+app.post("/api/addUserCloth", async (req, res) => {
   const input = req.body;
 
   try {

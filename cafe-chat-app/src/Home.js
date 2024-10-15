@@ -14,11 +14,9 @@ function Home() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Simulate data loading
     const loadData = () => {
-      // Replace this with your actual data fetching logic
       setTimeout(() => {
-        setLoading(false); // Data loading complete
+        setLoading(false);
       },1000); 
     };
 
@@ -26,7 +24,7 @@ function Home() {
   }, []);
 
   if (loading) {
-    return <h3 className="text-center">รอสักครู่นะคะ...</h3>; // You can also use a spinner here
+    return <h3 className="text-center">รอสักครู่นะคะ...</h3>;
   }
 
   return (
