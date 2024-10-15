@@ -44,6 +44,13 @@ module.exports = {
     return await pool.query(sql);
   },
 
+  updateDisplayName: async (pool, displayName, userID) => {
+    var sql = "UPDATE user SET displayName = ? WHERE userID = ?";
+    sql = mysql.format(sql, [displayName, userID]);
+
+    return await pool.query(sql);
+  },
+
   deleteUser: async (pool, userID) => {
     var sql = "DELETE FROM user WHERE userID = ?";
     sql = mysql.format(sql, [userID]);

@@ -709,3 +709,15 @@ app.get("/api/usercloth/:userID", async (req, res) => {
     }
   });
 });
+
+app.post("/api/updateDisplayName", async (req, res) => {
+  const { displayName, userID } = req.body;
+
+  try {
+    const result = await User.updateDisplayName(pool, displayName, userID);
+    res.json({ success: true, message: "DisplayName updated successfully!" });
+  } catch (error) {
+    console.error("Error updating DisplayName:", error);
+    res.status(500).json({ success: false, message: "Internal server error." });
+  }
+});
