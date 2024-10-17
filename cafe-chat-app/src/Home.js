@@ -71,7 +71,7 @@ function Home() {
       <div className="container absolute inset-x-0 top-0">
         <NavbarUser />
         <div>
-          <Link className="button-cloth" to="/dressup">
+          <Link className="button-cloth" to="/getdressed">
             แต่งตัว
           </Link>
         </div>

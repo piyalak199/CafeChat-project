@@ -603,25 +603,6 @@ app.post("/api/addUserHat", checkAuth, async (req, res) => {
   }
 });
 
-app.get("/api/userHats/:userID", async (req, res) => {
-  const userID = req.params.userID;
-  const sql = "SELECT hatID FROM user_hat WHERE userID = ?";
-
-  pool.query(sql, [userID], (error, results) => {
-    if (error) {
-      res.json({
-        result: false,
-        message: error.message,
-      });
-    } else {
-      res.json({
-        result: true,
-        data: results,
-      });
-    }
-  });
-});
-
 // สมมติว่ามีฟังก์ชัน getHatID ในโมดูล Hat
 app.get("/api/cloth/:clothID", async (req, res) => {
   const clothID = req.params.clothID;
@@ -691,9 +672,21 @@ app.post("/api/addUserCloth", async (req, res) => {
   }
 });
 
+app.post("/api/updateDisplayName", async (req, res) => {
+  const { displayName, userID } = req.body;
+
+  try {
+    const result = await User.updateDisplayName(pool, displayName, userID);
+    res.json({ success: true, message: "DisplayName updated successfully!" });
+  } catch (error) {
+    console.error("Error updating DisplayName:", error);
+    res.status(500).json({ success: false, message: "Internal server error." });
+  }
+});
+
 app.get("/api/usercloth/:userID", async (req, res) => {
   const userID = req.params.userID;
-  const sql = "SELECT clothID FROM user_cloth WHERE userID = ?";
+  const sql = "SELECT * FROM user_cloth WHERE userID = ?";
 
   pool.query(sql, [userID], (error, results) => {
     if (error) {
@@ -710,14 +703,57 @@ app.get("/api/usercloth/:userID", async (req, res) => {
   });
 });
 
-app.post("/api/updateDisplayName", async (req, res) => {
-  const { displayName, userID } = req.body;
+app.get("/api/userHats/:userID", async (req, res) => {
+  const userID = req.params.userID;
+  const sql = "SELECT * FROM user_hat WHERE userID = ?";
 
-  try {
-    const result = await User.updateDisplayName(pool, displayName, userID);
-    res.json({ success: true, message: "DisplayName updated successfully!" });
-  } catch (error) {
-    console.error("Error updating DisplayName:", error);
-    res.status(500).json({ success: false, message: "Internal server error." });
+  pool.query(sql, [userID], (error, results) => {
+    if (error) {
+      res.json({
+        result: false,
+        message: error.message,
+      });
+    } else {
+      res.json({
+        result: true,
+        data: results,
+      });
+    }
+  });
+});
+
+// สมมติว่ามีฟังก์ชัน getHatID ในโมดูล Hat
+app.get("/api/hatdetailuser/:userID", async (req, res) => {
+  const userID = req.params.userID;
+  const sql = "SELECT h.hatID, h.hatName, h.hatImg, h.hatCoin, uh.hat_active FROM hat h JOIN user_hat uh ON uh.hatID = h.hatID ";
+
+  if (userID == 0) {
+    pool.query(sql, (error, results) => {
+      if (error) {
+        res.json({
+          result: false,
+          message: error.message,
+        });
+      } else {
+        res.json({
+          result: true,
+          data: results,
+        });
+      }
+    });
+  } else {
+    pool.query(sql + "WHERE uh.userID = ?", [userID], (error, results) => {
+      if (error) {
+        res.json({
+          result: false,
+          message: error.message,
+        });
+      } else {
+        res.json({
+          result: true,
+          data: results,
+        });
+      }
+    });
   }
 });

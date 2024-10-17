@@ -7,7 +7,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 // Import all components
 import Login from "./Login";
 import Signup from "./Signup";
-import DressUp from "./DressUp";
+import GetDressed from "./GetDressed";
 import Home from "./Home";
 import ChatRoom from "./ChatRoom";
 import PetSelect from "./PetSelect";
@@ -21,7 +21,7 @@ const router = createBrowserRouter([
   { path: "/", element: <App /> },
   { path: "/login", element: <Login /> },
   { path: "/signup", element: <Signup /> },
-  { path: "/dressup", element: (<CheckAuth><DressUp /></CheckAuth>) },
+  { path: "/getdressed", element: (<CheckAuth><GetDressed /></CheckAuth>) },
   { path: "/shophat", element: (<CheckAuth><ShopHat /></CheckAuth>) },
   { path: "/shopcloth", element: (<CheckAuth><ShopCloth /></CheckAuth>) },
   { path: "/home", element: (<CheckAuth><Home /></CheckAuth>) },

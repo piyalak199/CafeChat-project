@@ -4,9 +4,11 @@ import React, { useEffect, useState } from "react";
 import NavbarUser from "./NavbarUser";
 import { API_GET, API_POST } from "./api"; // Import API_GET and API_POST
 import bgShop from "./img/Shop/bgShop.png";
-import modelAvatar from "./img//Shop/model.png";
+import modelAvatar from "./img/Shop/model.png";
 import coinicon from "./img/Shop/coin.png";
 import { useNavigate } from "react-router-dom";
+
+
 
 import "./ShopHat.css";
 

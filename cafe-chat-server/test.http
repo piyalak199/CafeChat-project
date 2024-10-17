@@ -65,4 +65,4 @@
 #     "userID": 1
 # }
 
-
+GET http://localhost:3001/hatdetailuser/3
