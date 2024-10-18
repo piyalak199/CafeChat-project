@@ -124,16 +124,6 @@ export default function ChatRoom() {
         <div className="flex justify-center">
           <div className="border-b border-black h-32 w-full mx-40 mb-10 rounded-0">
             {/* แสดงรายชื่อผู้ใช้ในห้อง */}
-
-            {/* <div >
-              <h4>Users in room:</h4>
-              <ul>
-                {usersInRoom.map((user, index) => (
-                  <li key={index}>{user}</li>
-                ))}
-              </ul>
-            </div> */}
-
             <div>
               <h4>Users in room:</h4>
               <ul className="list-inline">

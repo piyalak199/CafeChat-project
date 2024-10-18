@@ -12,6 +12,12 @@ const cors = require("cors");
 const express = require("express");
 const app = express();
 const port = 3001;
+const axios = require('axios');
+const fs = require('fs');
+
+const upload = multer({ dest: "uploads/" }); // กำหนดโฟลเดอร์ที่ใช้เก็บไฟล์ที่อัปโหลด
+
+
 
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -30,65 +36,6 @@ var pool = mysql.createPool({
 const server = app.listen(port, () => {
   console.log(`Server running at ${port}`);
 });
-// const { Server } = require("socket.io");
-// const io = new Server(server, {
-//   cors: {
-//     origin: "http://localhost:3000",
-//     methods: ["GET", "POST"],
-//   },
-// });
-
-// const roomUsers = {}; // เก็บรายชื่อผู้ใช้ในแต่ละห้อง
-
-// io.on("connection", (socket) => {
-//   console.log("A user connected:", socket.id);
-
-//   // Join a specific chat room
-//   socket.on("joinRoom", ({ roomID, displayName }) => {
-//     socket.join(roomID);
-
-//     // เพิ่มผู้ใช้ในห้องนั้น
-//     if (!roomUsers[roomID]) {
-//       roomUsers[roomID] = [];
-//     }
-//     roomUsers[roomID].push(displayName);
-
-//     // ส่งรายชื่อผู้ใช้ในห้องกลับไปยัง Client
-//     io.to(roomID).emit("updateUsersInRoom", roomUsers[roomID]);
-//     console.log(`${displayName} joined room ${roomID}`);
-//   });
-
-//   // Leave a specific chat room
-//   socket.on("leaveRoom", ({ roomID, displayName }) => {
-//     socket.leave(roomID);
-
-//     // ลบผู้ใช้ออกจากห้อง
-//     if (roomUsers[roomID]) {
-//       roomUsers[roomID] = roomUsers[roomID].filter(
-//         (user) => user !== displayName
-//       );
-//       if (roomUsers[roomID].length === 0) {
-//         delete roomUsers[roomID]; // ถ้าไม่มีผู้ใช้ในห้องแล้ว ให้ลบห้องออกจาก roomUsers
-//       }
-//     }
-
-//     // ส่งรายชื่อผู้ใช้ที่เหลือในห้องกลับไปยัง Client
-//     io.to(roomID).emit("updateUsersInRoom", roomUsers[roomID]);
-//     console.log(`${displayName} left room ${roomID}`);
-//   });
-
-//   // Handle incoming messages
-//   socket.on("sendMessage", (message) => {
-//     io.to(message.room).emit("message", {
-//       sender: message.sender,
-//       text: message.text,
-//     });
-//   });
-
-//   socket.on("disconnect", () => {
-//     console.log("A user disconnected:", socket.id);
-//   });
-// });
 
 const { Server } = require("socket.io");
 const io = new Server(server, {
@@ -722,7 +669,7 @@ app.get("/api/userHats/:userID", async (req, res) => {
   });
 });
 
-// สมมติว่ามีฟังก์ชัน getHatID ในโมดูล Hat
+// สมมติว่ามีฟังก์ชัน getHatID Hat
 app.get("/api/hatdetailuser/:userID", async (req, res) => {
   const userID = req.params.userID;
   const sql = "SELECT h.hatID, h.hatName, h.hatImg, h.hatCoin, uh.hat_active FROM hat h JOIN user_hat uh ON uh.hatID = h.hatID ";
@@ -757,3 +704,40 @@ app.get("/api/hatdetailuser/:userID", async (req, res) => {
     });
   }
 });
+
+// ฟังก์ชัน Type Coin / coinID
+app.get("/api/typecoin/:coinID", async (req, res) => {
+  const coinID = req.params.coinID;
+  const sql = "SELECT coinID, coin, price FROM typecoin  ";
+
+  if (coinID == 0) {
+    pool.query(sql, (error, results) => {
+      if (error) {
+        res.json({
+          result: false,
+          message: error.message,
+        });
+      } else {
+        res.json({
+          result: true,
+          data: results,
+        });
+      }
+    });
+  } else {
+    pool.query(sql + "WHERE coinID = ?", [coinID], (error, results) => {
+      if (error) {
+        res.json({
+          result: false,
+          message: results,
+        });
+      } else {
+        res.json({
+          result: true,
+          data: results,
+        });
+      }
+    });
+  }
+});
+

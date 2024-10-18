@@ -1,0 +1,62 @@
+.relative {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-left: 1rem; /* เท่ากับ px-4 */
+  padding-right: 1rem; /* เท่ากับ px-4 */
+  padding-top: 0; /* เท่ากับ pt-0 */
+}
+
+.img-bgCoin {
+  width: 40%; /* เท่ากับ w-2/5 */
+}
+
+.title {
+  position: absolute;
+  font-size: 1.5rem; /* เท่ากับ text-2xl */
+  top: 2rem; /* ปรับตำแหน่งให้เหมาะสม */
+}
+
+.box {
+  background-color: #ffffff;
+  border: 2px solid black;
+  border-radius: 5px;
+  padding-top: 1px;
+  margin-bottom: 3rem;
+  width: 120px;
+  height: 150px;
+  transform: translate(0%, -8%);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative; /* ทำให้กล่องทั้งหมดสามารถคลิกได้ */
+  z-index: 1; /* เพิ่ม z-index เพื่อให้แน่ใจว่าอยู่ด้านบน */
+  pointer-events: auto;
+
+}
+.cointext {
+  text-align: center;
+  margin-top: 10px;
+}
+.coinicon {
+  align-items: center;
+  width: 42%;
+  margin-top: 5px;
+}
+.price {
+  transform: translate(0%, 40%);
+  font-size: 20px;
+  color: #555;
+  text-align: center;
+  border-top: #555 solid 1px;
+  width: 100%;
+}
+
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* 3 equal columns */
+  grid-gap: 16px; /* Adjust spacing between the boxes */
+}

@@ -43,12 +43,14 @@ const NavbarUser = () => {
               />
             </Link>
 
-            <div className="col-auto d-flex align-items-center right-section">
+            <div className="col-auto d-flex align-items-center right-section" >
               {/* Coin Section */}
-              <div className="d-flex align-items-center coin-section me-3">
+              <div className="d-flex align-items-center coin-section me-3" onClick={() => navigate("/addcoin")}>
                 <button className="btn btn-sm plus-button me-2">+</button>
                 <span className="coin-text me-2">{coin}</span>
                 <img src={coinpng} className="coin-icon" alt="Coin" />
+
+                
               </div>
 
               {/* Notifications */}

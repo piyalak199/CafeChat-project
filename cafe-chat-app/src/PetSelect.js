@@ -174,7 +174,7 @@ function PetSelect() {
       <NavbarUser />
       <div className="row flex justify-center">
         <div className="col-md-auto text-center">
-          <h5>สัตว์เลี้ยงที่คุณเลือก: {currentPetName ? `${currentPetName}` : "ยังไม่ได้เลือก"}</h5>
+          <div>สัตว์เลี้ยงของคุณ: {currentPetName ? `${currentPetName}` : "ยังไม่ได้เลือก"}</div>
         </div>
       </div>
       <div className="row flex justify-center">

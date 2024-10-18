@@ -15,6 +15,7 @@ import App from "./App";
 import CheckAuth from "./CheckAuth";
 import ShopHat from "./ShopHat";
 import ShopCloth from "./ShopCloth";
+import AddCoin from "./AddCoin"
 
 // Create a router with different paths
 const router = createBrowserRouter([
@@ -28,6 +29,7 @@ const router = createBrowserRouter([
   { path: "/chatroom", element: (<CheckAuth><ChatRoom /></CheckAuth>)},
   { path: "/chatroom/:roomID", element:(<CheckAuth>< ChatRoom/></CheckAuth>)},
   { path: "/petselect", element: (<CheckAuth><PetSelect /></CheckAuth>) },
+  { path: "/addcoin", element: (<CheckAuth><AddCoin /></CheckAuth>) },
 ]);
 
 // Create root for rendering

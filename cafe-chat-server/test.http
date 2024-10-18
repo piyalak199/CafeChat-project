@@ -65,4 +65,23 @@
 #     "userID": 1
 # }
 
-GET http://localhost:3001/hatdetailuser/3
+# GET http://localhost:3001/api/typecoin/1
+
+# POST http://localhost:3001/api/uploadSlip 
+# Content-Type: application/json
+
+# {
+#     "...": "...",
+# }
+
+# http://localhost:3001/typecoin/1
+
+POST http://localhost:3001/uploadSlip
+Content-Type: application/json
+
+ {
+    "file": "cafe-chat-server/uploads/IMG_5269.png" ,
+    "price": 10.00,
+    "coinID": 1
+ }
+

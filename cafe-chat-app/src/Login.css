@@ -35,7 +35,6 @@
     font-size: 16px;
     cursor: pointer;
     width: 100%;
-    font-family: "Comic Sans MS", "Comic Sans", cursive; /* Matching font style */
     display: flex;
     justify-content: center;
     align-items: center;
