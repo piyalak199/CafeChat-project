@@ -1,16 +1,15 @@
 const mysql = require("mysql");
 
 module.exports = {
-  getByTypeCoin: async (pool, coinID) => {
-    var sql = "SELECT coinID, coin, price FROM typecoin WHERE coinID = ?";
-    sql = mysql.format(sql, [coinID]);
+  updateAddCoin: async (pool, coinID, userID) => {
+    var sql =
+      "UPDATE USER u " +
+      " JOIN typecoin tc ON tc.coinID = ? " +
+      " SET u.coin = u.coin + tc.coin " +
+      " WHERE u.userID = ? ";
 
-    // ใช้ await เพื่อรอการ query ให้เสร็จสิ้น
-    const results = await pool.query(sql);
+    sql = mysql.format(sql, [coinID, userID]);
 
-    return results;  // ควรส่งคืน array หรือ iterable
+    return await pool.query(sql);
   },
-
-  
 };
-

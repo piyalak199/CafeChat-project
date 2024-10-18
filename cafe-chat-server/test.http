@@ -76,12 +76,19 @@
 
 # http://localhost:3001/typecoin/1
 
-POST http://localhost:3001/uploadSlip
-Content-Type: application/json
+# POST http://localhost:3001/uploadSlip
+# Content-Type: application/json
 
- {
-    "file": "cafe-chat-server/uploads/IMG_5269.png" ,
-    "price": 10.00,
-    "coinID": 1
- }
+#  {
+#     "file": "cafe-chat-server/uploads/IMG_5269.png" ,
+#     "price": 10.00,
+#     "coinID": 1
+#  }
 
+# POST http://localhost:3001/updateAddCoin HTTP/1.1
+# Content-Type: application/json
+
+# {
+#     "coinID": 1,
+#     "userID": 1
+# }

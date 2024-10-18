@@ -54,8 +54,7 @@
   width: 100%;
 }
 
-
-.grid {
+.grid-coin {
   display: grid;
   grid-template-columns: repeat(3, 1fr); /* 3 equal columns */
   grid-gap: 16px; /* Adjust spacing between the boxes */

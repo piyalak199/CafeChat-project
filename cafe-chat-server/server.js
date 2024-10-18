@@ -7,17 +7,12 @@ const bodyParser = require("body-parser");
 
 const User = require("./libs/User");
 const ChatRoom = require("./libs/ChatRoom");
+const Coin = require("./libs/Coin")
 
 const cors = require("cors");
 const express = require("express");
 const app = express();
 const port = 3001;
-const axios = require('axios');
-const fs = require('fs');
-
-const upload = multer({ dest: "uploads/" }); // กำหนดโฟลเดอร์ที่ใช้เก็บไฟล์ที่อัปโหลด
-
-
 
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -741,3 +736,16 @@ app.get("/api/typecoin/:coinID", async (req, res) => {
   }
 });
 
+app.post("/api/updateAddCoin", async (req, res) => {
+  const { coinID, userID } = req.body;
+
+  try {
+    const result = await Coin.updateAddCoin(pool, coinID, userID);
+
+    // ตรวจสอบว่ามีการเปลี่ยนแปลงหรือไม่
+    res.json({ success: true, message: "Coins updated successfully!" });
+  } catch (error) {
+    console.error("Error updating coins:", error);
+    res.status(500).json({ success: false, message: "Internal server error." });
+  }
+});
