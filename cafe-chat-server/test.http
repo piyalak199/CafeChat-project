@@ -92,3 +92,21 @@
 #     "coinID": 1,
 #     "userID": 1
 # }
+
+# GET http://localhost:3001/api/clothdetailuser/2
+
+# POST http://localhost:3001/api/updateHatStatus HTTP/1.1
+# Content-Type: application/json
+
+# {
+#     "userID": 1,
+#     "hatID": 1
+# }
+
+# POST http://localhost:3001/api/updateClothStatus HTTP/1.1
+# Content-Type: application/json
+
+# {
+#     "userID": 1,
+#     "clothID": 1
+# }

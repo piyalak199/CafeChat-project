@@ -1,148 +1,58 @@
-
-// import "bootstrap/dist/css/bootstrap.min.css";
-// import React, { useEffect, useState } from "react";
-// import { API_GET } from "./api"; // Make sure to import your API functions
-// import NavbarUser from "./NavbarUser.js";
-// import bgShop from "./img/Shop/bgShop.png";
-// import modelAvatar from "./img/Shop/model.png";
-// import { useNavigate } from "react-router-dom"; // Import useNavigate for navigation
-
-// export default function GetDressed() {
-//   const userID = localStorage.getItem("userID"); // Get userID from localStorage
-//   const [userHats, setUserHats] = useState([]); // State to store purchased hats
-//   const [loading, setLoading] = useState(true); // Loading state
-//   const navigate = useNavigate(); // Hook for navigation
-
-//   useEffect(() => {
-//     const fetchUserHats = async () => {
-//       try {
-//         const response = await API_GET(`userHats/${userID}`);
-//         console.log("API Response:", response); // Log the response
-
-//         if (response.result) {
-//           setUserHats(response.data); // Assuming response.data contains the hat objects
-//         } else {
-//           console.error("Failed to fetch user hats.");
-//         }
-//       } catch (error) {
-//         console.error("Error fetching user hats:", error); // Log any errors
-//       } finally {
-//         setLoading(false); // Set loading to false after fetching
-//       }
-//     };
-
-//     fetchUserHats();
-//   }, [userID]);
-
-//   if (loading) {
-//     return <div>Loading...</div>; // Show loading indicator
-//   }
-
-//   return (
-//     <div className="container absolute inset-x-0 top-0">
-//       <NavbarUser />
-
-//         {/* Row 1: Avatar and Shop Name */}
-//         <h className="row mb-4">
-//           <div className="col text-center">
-//             <img
-//               src={bgShop}
-//               alt="Shop Background"
-//               className="img-fluid w-100 px-48"
-//             />
-//           </div>
-//         </h>
-//         {/* Row 2: Category Buttons */}
-//         <div className="row mb-4 px-36">
-//           <div className="col ">
-//             <button className="btn btn-primary mx-2 w-32" disabled>
-//               หมวก
-//             </button>
-//             <button
-//               className="btn btn-primary mx-2 w-32"
-//               onClick={() => navigate("/shopcloth")}
-//             >
-//               เสื้อผ้า
-//             </button>
-//           </div>
-//         </div>
-//         {/* Row 3: List of Hats */}
-//         <div className="card p-4 mx-32 mb-4">
-//           <div className="row ">
-//             {userHats.length > 0 ? (
-//               <div>
-//                 {userHats.map((hat) => {
-//                   console.log("Current Hat Object:", hat); // Log the current hat object
-//                   return (
-//                     <div key={hat.hatID}>
-//                       <div>Hat ID: {hat.hatID} </div>
-//                       <div>Hat Active: {hat.hat_active}</div>
-//                       <div className="avatar-container">
-//                         {/* Model Avatar */}
-//                         <img
-//                           src={modelAvatar}
-//                           alt="Model Avatar"
-//                           className="avatar-image"
-//                         />
-//                         {/* Hat Item */}
-//                         <img
-//                           src={`http://localhost:3001/img/hat/${hat.hatImg}`}
-//                           alt="Hat"
-//                           className="hat-image"
-//                         />
-//                       </div>
-//                     </div>
-//                   );
-//                 })}
-//               </div>
-//             ) : (
-//               <p>คุณยังไม่ได้ซื้อหมวกใด ๆ</p> // Message if no hats are purchased
-//             )}
-//           </div>
-//         </div>
-//       </div>
-//   );
-// }
-
-
-
 import "bootstrap/dist/css/bootstrap.min.css";
 import React, { useEffect, useState } from "react";
-import { API_GET } from "./api"; // Make sure to import your API functions
+import { API_GET, API_POST } from "./api.js";
 import NavbarUser from "./NavbarUser.js";
-import bgShop from "./img/Shop/bgShop.png";
+import Seller from "./img/Shop/seller.png";
 import modelAvatar from "./img/Shop/model.png";
-import { useNavigate } from "react-router-dom"; // Import useNavigate for navigation
+import { useNavigate } from "react-router-dom";
+// import "./GetDressed.css";
+import Avatar from "./Avatar.js";
 
 export default function GetDressed() {
-  const userID = localStorage.getItem("userID"); // Get userID from localStorage
-  const [userHats, setUserHats] = useState([]); // State to store purchased hats
-  const [loading, setLoading] = useState(true); // Loading state
-  const navigate = useNavigate(); // Hook for navigation
+  const userID = localStorage.getItem("userID");
+  const [userClothes, setUserClothes] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchUserHats = async () => {
+    const fetchUserClothes = async () => {
       try {
-        const response = await API_GET(`hatdetailuser/${userID}`); // Call the correct API endpoint
-        console.log("API Response:", response); // Log the response
+        const response = await API_GET(`clothdetailuser/${userID}`);
 
         if (response.result) {
-          setUserHats(response.data); // Assuming response.data contains the hat objects
+          setUserClothes(response.data);
         } else {
-          console.error("Failed to fetch user hats.");
+          console.error("Failed to fetch user clothes.");
         }
       } catch (error) {
-        console.error("Error fetching user hats:", error); // Log any errors
+        console.error("Error fetching user clothes:", error);
       } finally {
-        setLoading(false); // Set loading to false after fetching
+        setLoading(false);
       }
     };
 
-    fetchUserHats();
+    fetchUserClothes();
   }, [userID]);
 
+  const handleClothActive = async (clothID) => {
+    try {
+      const response = await API_POST("updateclothStatus", { userID, clothID });
+      if (response.result) {
+        // Update the usercloths state locally
+        const updatedClothes = userClothes.map((cloth) =>
+          cloth.clothID === clothID
+            ? { ...cloth, cloth_active: "y" }
+            : { ...cloth, cloth_active: "n" }
+        );
+        setUserClothes(updatedClothes);
+      }
+    } catch (error) {
+      console.error("Error updating cloth status:", error);
+    }
+  };
+
   if (loading) {
-    return <div>Loading...</div>; // Show loading indicator
+    return <div>Loading...</div>;
   }
 
   return (
@@ -150,40 +60,55 @@ export default function GetDressed() {
       <NavbarUser />
 
       {/* Row 1: Avatar and Shop Name */}
-      <h className="row mb-4">
-        <div className="col text-center">
-          <img
-            src={bgShop}
-            alt="Shop Background"
-            className="img-fluid w-100 px-48"
-          />
-        </div>
-      </h>
+      <div className="container text-center">
+        <headers className="row px-32">
+          <div className="col ">
+            <img
+              src={Seller}
+              alt="Shop Background"
+              className="img-fluid w-60 rounded mx-auto d-block "
+            />
+          </div>
+          <div className="col text-center">
+            <h1>แต่งตัว</h1>
+            <h2>สวมเสื้อผ้า</h2>
+          </div>
+          <div className="col text-center">
+            <div className="avatar-container">
+              <Avatar
+                activeClothes={userClothes.filter((cloth) => cloth.cloth_active === "y")}
+              />
+            </div>
+          </div>
+        </headers>
+      </div>
+
       {/* Row 2: Category Buttons */}
       <div className="row mb-4 px-36">
         <div className="col ">
-          <button className="btn btn-primary mx-2 w-32" disabled>
-            หมวก
-          </button>
           <button
             className="btn btn-primary mx-2 w-32"
-            onClick={() => navigate("/shopcloth")}
+            onClick={() => navigate("/gethats")}
           >
+            หมวก
+          </button>
+          <button className="btn btn-primary mx-2 w-32" disabled>
             เสื้อผ้า
           </button>
         </div>
       </div>
-      {/* Row 3: List of Hats */}
+
+      {/* Row 3: List of Clothes */}
       <div className="card p-4 mx-32 mb-4">
         <div className="row ">
-          {userHats.length > 0 ? (
+          {userClothes.length > 0 ? (
             <div>
-              {userHats.map((hat) => {
-                console.log("Current Hat Object:", hat); // Log the current hat object
+              {userClothes.map((cloth) => {
+                console.log("Current cloth Object:", cloth); // Log the current cloth object
                 return (
-                  <div key={hat.hatID}>
-                    <div>Hat ID: {hat.hatID}</div>
-                    <div>Hat Name: {hat.hatName}</div>
+                  <div key={cloth.clothID}>
+                    <div>Cloth ID: {cloth.clothID}</div>
+                    <div>Cloth Name: {cloth.clothName}</div>
                     <div className="avatar-container">
                       {/* Model Avatar */}
                       <img
@@ -191,21 +116,24 @@ export default function GetDressed() {
                         alt="Model Avatar"
                         className="avatar-image"
                       />
-                      {/* Hat Item */}
+                      {/* Cloth Item */}
                       <img
-                        src={`http://localhost:3001/img/hat/${hat.hatImg}`}
-                        alt="Hat"
-                        className="hat-image"
+                        src={`http://localhost:3001/img/Clothes/${cloth.clothImg}`}
+                        alt="Cloth"
+                        className="cloth-image"
                       />
                     </div>
-                    <div>Hat active: {hat.hat_active}</div>
+                    {/* Button to activate the cloth */}
+                    <button onClick={() => handleClothActive(cloth.clothID)}>
+                      {cloth.cloth_active === "y" ? "สวมแล้ว" : "สวมหมวก"}
+                    </button>
                     <div>----------------------------------------</div>
                   </div>
                 );
               })}
             </div>
           ) : (
-            <p>คุณยังไม่ได้ซื้อหมวกใด ๆ</p> // Message if no hats are purchased
+            <p>คุณยังไม่ได้ซื้อเสื้อผ้าใด ๆ</p> // Message if no clothes are purchased
           )}
         </div>
       </div>

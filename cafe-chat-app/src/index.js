@@ -7,7 +7,6 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 // Import all components
 import Login from "./Login";
 import Signup from "./Signup";
-import GetDressed from "./GetDressed";
 import Home from "./Home";
 import ChatRoom from "./ChatRoom";
 import PetSelect from "./PetSelect";
@@ -16,12 +15,15 @@ import CheckAuth from "./CheckAuth";
 import ShopHat from "./ShopHat";
 import ShopCloth from "./ShopCloth";
 import AddCoin from "./AddCoin"
+import GetHats from "./GetHats";
+import GetDressed from "./GetDressed";
 
 // Create a router with different paths
 const router = createBrowserRouter([
   { path: "/", element: <App /> },
   { path: "/login", element: <Login /> },
   { path: "/signup", element: <Signup /> },
+  { path: "/gethats", element: (<CheckAuth><GetHats /></CheckAuth>) },
   { path: "/getdressed", element: (<CheckAuth><GetDressed /></CheckAuth>) },
   { path: "/shophat", element: (<CheckAuth><ShopHat /></CheckAuth>) },
   { path: "/shopcloth", element: (<CheckAuth><ShopCloth /></CheckAuth>) },

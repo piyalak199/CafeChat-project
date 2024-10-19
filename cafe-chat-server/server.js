@@ -664,7 +664,7 @@ app.get("/api/userHats/:userID", async (req, res) => {
   });
 });
 
-// สมมติว่ามีฟังก์ชัน getHatID Hat
+// ฟังก์ชัน get Hat Detail UserID
 app.get("/api/hatdetailuser/:userID", async (req, res) => {
   const userID = req.params.userID;
   const sql = "SELECT h.hatID, h.hatName, h.hatImg, h.hatCoin, uh.hat_active FROM hat h JOIN user_hat uh ON uh.hatID = h.hatID ";
@@ -699,6 +699,141 @@ app.get("/api/hatdetailuser/:userID", async (req, res) => {
     });
   }
 });
+
+// ฟังก์ชัน get Cloth Detail UserID
+app.get("/api/clothdetailuser/:userID", async (req, res) => {
+  const userID = req.params.userID;
+  const sql = "SELECT h.clothID, h.clothName, h.clothImg, h.clothCoin, uh.cloth_active FROM cloth h JOIN user_cloth uh ON uh.clothID = h.clothID ";
+
+  if (userID == 0) {
+    pool.query(sql, (error, results) => {
+      if (error) {
+        res.json({
+          result: false,
+          message: error.message,
+        });
+      } else {
+        res.json({
+          result: true,
+          data: results,
+        });
+      }
+    });
+  } else {
+    pool.query(sql + "WHERE uh.userID = ?", [userID], (error, results) => {
+      if (error) {
+        res.json({
+          result: false,
+          message: error.message,
+        });
+      } else {
+        res.json({
+          result: true,
+          data: results,
+        });
+      }
+    });
+  }
+});
+
+// Update Hat Active
+app.post("/api/updateHatStatus", async (req, res) => {
+  const { userID, hatID } = req.body; // รับข้อมูลจาก body ของ request
+
+  if (!userID || !hatID) {
+    return res.status(400).json({
+      result: false,
+      message: "Missing userID or hatID",
+    });
+  }
+
+  // SQL statement สำหรับรีเซ็ต hat_active ทั้งหมดเป็น 'n'
+  const resetHatStatusSQL = "UPDATE user_hat SET hat_active = 'n' WHERE userID = ?";
+  // SQL statement สำหรับอัปเดต hat_active ของหมวกที่เลือกให้เป็น 'y'
+  const updateHatStatusSQL = "UPDATE user_hat SET hat_active = 'y' WHERE userID = ? AND hatID = ?";
+
+  try {
+    // 1. รีเซ็ตหมวกทั้งหมดของ userID นั้นเป็น 'n'
+    pool.query(resetHatStatusSQL, [userID], (resetError, resetResults) => {
+      if (resetError) {
+        return res.json({
+          result: false,
+          message: resetError.message,
+        });
+      }
+
+      // 2. อัปเดตหมวกที่เลือกให้เป็น 'y'
+      pool.query(updateHatStatusSQL, [userID, hatID], (updateError, updateResults) => {
+        if (updateError) {
+          return res.json({
+            result: false,
+            message: updateError.message,
+          });
+        }
+
+        res.json({
+          result: true,
+          message: "Hat status updated successfully",
+        });
+      });
+    });
+  } catch (error) {
+    res.status(500).json({
+      result: false,
+      message: "Error updating hat status",
+    });
+  }
+});
+
+// Update cloth Active
+app.post("/api/updateClothStatus", async (req, res) => {
+  const { userID, clothID } = req.body; // รับข้อมูลจาก body ของ request
+
+  if (!userID || !clothID) {
+    return res.status(400).json({
+      result: false,
+      message: "Missing userID or clothID",
+    });
+  }
+
+  // SQL statement สำหรับรีเซ็ต cloth_active ทั้งหมดเป็น 'n'
+  const resetClothStatusSQL = "UPDATE user_cloth SET cloth_active = 'n' WHERE userID = ?";
+  // SQL statement สำหรับอัปเดต cloth_active ของหมวกที่เลือกให้เป็น 'y'
+  const updateClothStatusSQL = "UPDATE user_cloth SET cloth_active = 'y' WHERE userID = ? AND clothID = ?";
+
+  try {
+    // 1. รีเซ็ตหมวกทั้งหมดของ userID นั้นเป็น 'n'
+    pool.query(resetClothStatusSQL, [userID], (resetError, resetResults) => {
+      if (resetError) {
+        return res.json({
+          result: false,
+          message: resetError.message,
+        });
+      }
+
+      // 2. อัปเดตหมวกที่เลือกให้เป็น 'y'
+      pool.query(updateClothStatusSQL, [userID, clothID], (updateError, updateResults) => {
+        if (updateError) {
+          return res.json({
+            result: false,
+            message: updateError.message,
+          });
+        }
+
+        res.json({
+          result: true,
+          message: "cloth status updated successfully",
+        });
+      });
+    });
+  } catch (error) {
+    res.status(500).json({
+      result: false,
+      message: "Error updating cloth status",
+    });
+  }
+});
+
 
 // ฟังก์ชัน Type Coin / coinID
 app.get("/api/typecoin/:coinID", async (req, res) => {
