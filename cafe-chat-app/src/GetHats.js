@@ -9,27 +9,38 @@ import Avatar from "./Avatar.js";
 
 export default function GetHats() {
   const userID = localStorage.getItem("userID");
-  const [userHats, setUserHats] = useState([]);
+  const [userClothes, setUserClothes] = useState([]);
+  const [userHats, setUserHats] = useState([]); // State สำหรับเก็บข้อมูลหมวก
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchUserHats = async () => {
+    const fetchUserData = async () => {
       try {
-        const response = await API_GET(`hatdetailuser/${userID}`);
-        if (response.result) {
-          setUserHats(response.data);
+        const [clothesResponse, hatsResponse] = await Promise.all([
+          API_GET(`clothdetailuser/${userID}`),
+          API_GET(`hatdetailuser/${userID}`), // สมมติว่ามี API สำหรับดึงข้อมูลหมวก
+        ]);
+
+        if (clothesResponse.result) {
+          setUserClothes(clothesResponse.data);
+        } else {
+          console.error("Failed to fetch user clothes.");
+        }
+
+        if (hatsResponse.result) {
+          setUserHats(hatsResponse.data); // เก็บข้อมูลหมวกใน state
         } else {
           console.error("Failed to fetch user hats.");
         }
       } catch (error) {
-        console.error("Error fetching user hats:", error);
+        console.error("Error fetching user data:", error);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchUserHats();
+    fetchUserData();
   }, [userID]);
 
   const handleHatActive = async (hatID) => {
@@ -73,7 +84,10 @@ export default function GetHats() {
           <div className="col text-center">
             <div className="avatar-container">
               <Avatar
-                activeHats={userHats.filter((hat) => hat.hat_active === "y")}
+                activeClothes={userClothes.filter(
+                  (cloth) => cloth.cloth_active === "y"
+                )}
+                activeHats={userHats.filter((hat) => hat.hat_active === "y")} // ส่งข้อมูลหมวก
               />
             </div>
           </div>
@@ -95,34 +109,45 @@ export default function GetHats() {
       </div>
 
       <div className="card p-4 mx-32 mb-4">
-        <div className="row ">
-          {userHats.length > 0 ? (
-            userHats.map((hat) => (
-              <div key={hat.hatID}>
-                <div>Hat ID: {hat.hatID}</div>
-                <div>Hat Name: {hat.hatName}</div>
-                <div className="avatar-container">
-                  <img
-                    src={modelAvatar}
-                    alt="Model Avatar"
-                    className="avatar-image"
-                  />
-                  <img
-                    src={`http://localhost:3001/img/hat/${hat.hatImg}`}
-                    alt="Hat"
-                    className="hat-image"
-                  />
+        <div className="container ">
+          <div className=" row row-cols-3">
+            {userHats.length > 0 ? (
+              userHats.map((hat) => (
+                <div className="col md-4">
+                  <div className="card m-2 p-2" key={hat.hatID}>
+                    {/* <div>Hat ID: {hat.hatID}</div> */}
+                    <div>Hat Name: {hat.hatName}</div>
+                    <div className="avatar-container">
+                      <img
+                        src={modelAvatar}
+                        alt="Model Avatar"
+                        className="avatar-image"
+                      />
+                      <img
+                        src={`http://localhost:3001/img/hat/${hat.hatImg}`}
+                        alt="Hat"
+                        className="hat-image"
+                      />
+                    </div>
+                    {/* Button to activate the hat */}
+                    <button
+                      onClick={() => handleHatActive(hat.hatID)}
+                      disabled={hat.hat_active === "y"}
+                      className={
+                        hat.hat_active === "y"
+                          ? "btn border-t-pink-400 btn-disabled"
+                          : "btn btn-primary"
+                      }
+                    >
+                      {hat.hat_active === "y" ? "สวมแล้ว" : "สวมหมวก"}
+                    </button>
+                  </div>
                 </div>
-                {/* Button to activate the hat */}
-                <button onClick={() => handleHatActive(hat.hatID)}>
-                  {hat.hat_active === "y" ? "สวมแล้ว" : "สวมหมวก"}
-                </button>
-                <div>----------------------------------------</div>
-              </div>
-            ))
-          ) : (
-            <p>คุณยังไม่ได้ซื้อหมวกใด ๆ</p>
-          )}
+              ))
+            ) : (
+              <p>คุณยังไม่ได้ซื้อหมวกใด ๆ</p>
+            )}
+          </div>
         </div>
       </div>
     </div>

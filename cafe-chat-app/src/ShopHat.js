@@ -8,8 +8,6 @@ import modelAvatar from "./img/Shop/model.png";
 import coinicon from "./img/Shop/coin.png";
 import { useNavigate } from "react-router-dom";
 
-
-
 import "./ShopHat.css";
 
 function ShopHat() {
@@ -144,7 +142,12 @@ function ShopHat() {
             <button className="btn btn-primary mx-2 w-32 " disabled>
               หมวก
             </button>
-            <button className="btn btn-primary mx-2 w-32" onClick={() => navigate("/shopcloth")} > เสื้อผ้า</button>
+            <button
+              className="btn btn-primary mx-2 w-32"
+              onClick={() => navigate("/shopcloth")}
+            >
+              เสื้อผ้า
+            </button>
           </div>
         </div>
         {/* Row 3: List of Hats */}
