@@ -15,8 +15,8 @@ function AddCoin() {
   const [slipokData, setSlipokData] = useState([]);
   const [files, setFiles] = useState("");
 
-  const [submitStatus, setSubmitStatus] = useState(false); 
-  const [userCoins, setUserCoins] = useState([]); 
+  const [submitStatus, setSubmitStatus] = useState(false);
+  const [userCoins, setUserCoins] = useState([]);
 
   const handleFile = (e) => {
     setFiles(e.target.files[0]);
@@ -24,61 +24,92 @@ function AddCoin() {
 
   console.log("Select files: ", files);
 
+
+  //     // Check if the slip amount matches the selected coin price
+  //     if (data.data.success && data.data.amount === selectedCoin.price) {
+  //       setSubmitStatus("success");
+
+  //       // Update User Coins in the database
+  //       const userID = localStorage.getItem("userID");
+  //       const response = await API_POST("updateAddCoin", {
+  //         coinID: selectedCoin.coinID,
+  //         userID,
+  //       });
+
+  //       if (response.success) {
+  //         console.log("Coins updated successfully");
+
+  //         // อัปเดตเหรียญใน localStorage และ state ของเหรียญผู้ใช้
+  //         const userCoins = localStorage.getItem("coin") || 0; // ดึงเหรียญจาก localStorage
+  //         const newCoinBalance =
+  //           parseInt(userCoins) + parseInt(selectedCoin.coin); // เพิ่มเหรียญที่ได้รับ
+  //         localStorage.setItem("coin", newCoinBalance); // อัปเดต localStorage
+  //         setUserCoins(newCoinBalance); // อัปเดต state
+  //         setShowModal(false);
+  //       } else {
+  //         console.log("Failed to update coins:", response.message);
+  //       }
+
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     const formData = new FormData();
-    formData.append("files", files);
+    formData.append("files", files);     // เพิ่มไฟล์ที่เลือก
+    formData.append("log", "true");      // เพิ่มค่า log เป็นสตริง "true"
+    
     try {
-      const res = await fetch("https://api.slipok.com/api/line/apikey/32065", {
+      const res = await fetch("https://api.slipok.com/api/line/apikey/32065/", {
         method: "POST",
         headers: {
-          "x-authorization": "SLIPOKEIYQA0V",
+          "x-authorization": "SLIPOKEIYQA0V", // ตรวจสอบว่า API key ถูกต้อง
         },
-        body: formData,
+        body: formData
       });
-
-      if (!res.ok) {
-        throw new Error("Failed to send a request");
-      }
-
-      const data = await res.json();
-      setSlipokData(data.data);
+  
+      // Parse the response JSON
+      const data = await res.json();    // เรียก json ก่อนตรวจสอบ res.ok
       console.log("SlipOk data: ", data);
+  
+      if (res.ok) {
+        console.log("Request successfully");
+        setSlipokData(data.data);        // ตั้งค่า slipokData ถ้าสำเร็จ
 
-      // Check if the slip amount matches the selected coin price
-      if (data.data.success && data.data.amount === selectedCoin.price) {
-        setSubmitStatus("success");
-
-        // Update User Coins in the database
-        const userID = localStorage.getItem("userID");
-        const response = await API_POST("updateAddCoin", {
-          coinID: selectedCoin.coinID,
-          userID,
-        });
-
-        if (response.success) {
-          console.log("Coins updated successfully");
-
-          // อัปเดตเหรียญใน localStorage และ state ของเหรียญผู้ใช้
-          const userCoins = localStorage.getItem("coin") || 0; // ดึงเหรียญจาก localStorage
-          const newCoinBalance =
-            parseInt(userCoins) + parseInt(selectedCoin.coin); // เพิ่มเหรียญที่ได้รับ
-          localStorage.setItem("coin", newCoinBalance); // อัปเดต localStorage
-          setUserCoins(newCoinBalance); // อัปเดต state
-          setShowModal(false);
-        } else {
-          console.log("Failed to update coins:", response.message);
-        }
-        
       } else {
-        setSubmitStatus("failure");
+        throw new Error(`Failed to send a request: ${data.message || res.statusText}`);
       }
+  
     } catch (error) {
-      console.log("Error fetching data:", error);
-      setSubmitStatus("failure");
+      console.error("Error fetching data:", error);
     }
-    
   };
+
+  const handleSendSlip = async () => {
+    if (!slipokData.success) {
+      alert("Slip validation failed!");
+      return;
+    }
+  
+    // Update User Coins in the database
+    const userID = localStorage.getItem("userID");
+    const response = await API_POST("updateAddCoin", {
+      coinID: selectedCoin.coinID,
+      userID,
+    });
+  
+    if (response.success) {
+      console.log("Coins updated successfully");
+      const userCoins = localStorage.getItem("coin") || 0;
+      const newCoinBalance = parseInt(userCoins) + parseInt(selectedCoin.coin);
+      localStorage.setItem("coin", newCoinBalance);
+      setUserCoins(newCoinBalance);
+      setShowModal(false);
+      alert("Coin update successful!");
+    } else {
+      alert("Failed to update coins!");
+    }
+  };
+  
+  
 
   const handleCoinUpdate = (newCoin) => {
     setUserCoins((prevCoins) => {
@@ -161,11 +192,11 @@ function AddCoin() {
                   <p>{selectedCoin.coin} coin</p>
                   <p>{selectedCoin.price} บาท</p>
 
-                  <div className="mb-3">
+                  <div className="mb-3" >
                     <label htmlFor="uploadSlip" className="form-label">
                       อัปโหลดสลิปโอนเงิน
                     </label>
-                    <form>
+                    <form onSubmit={handleSubmit}>
                       <input
                         type="file"
                         className="form-control"
@@ -179,6 +210,11 @@ function AddCoin() {
                         alt="slip"
                         width={300}
                       />
+
+                      <button type="submit">
+                        Check Slip
+                      </button>
+
                       {slipokData?.success === true ? (
                         <p>สลิปถูกต้อง</p>
                       ) : (
@@ -197,24 +233,15 @@ function AddCoin() {
                     ยกเลิก
                   </button>
 
-                  <div>
+                 <div>
                     <button
                       type="submit"
                       className="btn btn-primary"
-                      onClick={handleSubmit}
-                      
+                      onClick={handleSendSlip}
                     >
                       ส่ง
-                    </button>
+                  </button>
 
-                    {/* Show the result based on submitStatus */}
-                    {submitStatus === "success" && (
-                      <p className="text-success mt-2">ส่งสำเร็จ</p>
-                      
-                    )}
-                    {submitStatus === "failure" && (
-                      <p className="text-danger mt-2">ส่งสลิปไม่สำเร็จ !!</p>
-                    )}
                   </div>
                 </div>
               </div>
