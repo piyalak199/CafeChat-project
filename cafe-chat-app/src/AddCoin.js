@@ -15,6 +15,7 @@ function AddCoin() {
   const [slipokData, setSlipokData] = useState([]);
   const [files, setFiles] = useState("");
   const [userCoins, setUserCoins] = useState([]);
+  const [isSlipSubmitted, setIsSlipSubmitted] = useState(false); // New state variable
 
   const handleFile = (e) => {
     setFiles(e.target.files[0]);
@@ -42,6 +43,8 @@ function AddCoin() {
         console.log("Request successfully");
         setSlipokData(data.data);
 
+        setIsSlipSubmitted(true); // Mark that the slip has been submitted
+
         if (data.data.success) {
           // If slip is valid, check the amount
           if (data.data.amount === selectedCoin.price) {
@@ -55,7 +58,8 @@ function AddCoin() {
             if (response.success) {
               console.log("Coins updated successfully");
               const userCoins = localStorage.getItem("coin") || 0;
-              const newCoinBalance = parseInt(userCoins) + parseInt(selectedCoin.coin);
+              const newCoinBalance =
+                parseInt(userCoins) + parseInt(selectedCoin.coin);
               localStorage.setItem("coin", newCoinBalance);
               setUserCoins(newCoinBalance);
               setShowModal(false);
@@ -70,7 +74,9 @@ function AddCoin() {
           alert("Slip validation failed!");
         }
       } else {
-        throw new Error(`Failed to send a request: ${data.message || res.statusText}`);
+        throw new Error(
+          `Failed to send a request: ${data.message || res.statusText}`
+        );
       }
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -93,11 +99,13 @@ function AddCoin() {
     console.log("Coin selected:", coin.coin, "Price:", coin.price);
     setSelectedCoin(coin);
     setShowModal(true);
+    setIsSlipSubmitted(false); // Reset slip submission status when selecting a new coin
   };
 
   const handleClose = () => {
     setShowModal(false);
     setSelectedCoin(null);
+    setIsSlipSubmitted(false); // Reset slip submission status when selecting a new coin
   };
 
   return (
@@ -163,11 +171,16 @@ function AddCoin() {
                       width={300}
                     />
 
-                    <p>จำนวนเงิน: {slipokData?.amount}</p>
-                    {slipokData?.success === true ? (
-                      <p>สลิปถูกต้อง</p>
-                    ) : (
-                      <p>สลิปไม่ถูกต้อง !!</p>
+                    {/* Show amount and validation message only after submission */}
+                    {isSlipSubmitted && (
+                      <div>
+                        <p>จำนวนเงินที่คุณโอน: {slipokData?.amount}</p>
+                        {slipokData?.success === true ? (
+                          <p>สลิปถูกต้อง</p>
+                        ) : (
+                          <p>สลิปไม่ถูกต้อง !!</p>
+                        )}
+                      </div>
                     )}
                   </div>
                 </div>
@@ -184,7 +197,7 @@ function AddCoin() {
                     className="btn btn-primary"
                     onClick={handleSubmit} // Call handleSubmit to check and send slip
                   >
-                    ส่ง
+                    ส่งสลิปโอนเงิน
                   </button>
                 </div>
               </div>
