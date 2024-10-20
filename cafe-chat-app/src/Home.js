@@ -165,6 +165,7 @@ function Home() {
         <img src={bgHome} className="mt-2 w-full" alt="bgHome" />
       </div>
     </div>
+    // Home
   );
 }
 
