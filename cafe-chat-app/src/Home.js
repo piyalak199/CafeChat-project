@@ -3,12 +3,13 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { AiFillEdit } from "react-icons/ai";
 import { FaCirclePlay } from "react-icons/fa6";
-import { API_POST } from "./api"; // ใช้ฟังก์ชัน API_POST จาก api.js
+import { API_POST, API_GET } from "./api"; // ใช้ฟังก์ชัน API_POST จาก api.js
 
 import bgHome from "./img/Home/bgHome.png";
 
 import "./Home.css";
 import NavbarUser from "./NavbarUser.js";
+import Avatar from "./Avatar.js";
 
 function Home() {
   const [loading, setLoading] = useState(true);
@@ -20,6 +21,53 @@ function Home() {
   const [isInputClicked, setIsInputClicked] = useState(false);
 
   const userID = localStorage.getItem("userID");
+  const [activeHats, setActiveHats] = useState([]);
+  const [activeClothes, setActiveClothes] = useState([]);
+  const [currentPet, setCurrentPet] = useState(null); // Store current pet object
+
+  useEffect(() => {
+    const fetchActiveItems = async () => {
+      try {
+        // Fetch active hats
+        const hatsResponse = await API_GET(`hatdetailuser/${userID}`);
+        if (hatsResponse.result) {
+          const activeHats = hatsResponse.data.filter(
+            (hat) => hat.hat_active === "y"
+          );
+          setActiveHats(activeHats);
+        }
+
+        // Fetch active clothes
+        const clothesResponse = await API_GET(`clothdetailuser/${userID}`);
+        if (clothesResponse.result) {
+          const activeClothes = clothesResponse.data.filter(
+            (cloth) => cloth.cloth_active === "y"
+          );
+          setActiveClothes(activeClothes);
+        }
+
+        // Fetch selected pet
+        const petTypeID = localStorage.getItem("petTypeID");
+        if (petTypeID) {
+          const petResponse = await API_GET("pettype");
+          if (petResponse.result) {
+            const selectedPet = petResponse.data.find(
+              (pet) => pet.petTypeID === parseInt(petTypeID)
+            );
+            if (selectedPet) {
+              setCurrentPet(selectedPet); // Set the current selected pet object
+            }
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching active items:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchActiveItems();
+  }, [userID]);
 
   const handleInputChange = (e) => {
     setNewDisplayName(e.target.value);
@@ -83,7 +131,7 @@ function Home() {
         </Link>
 
         <div>
-          <AiFillEdit className="edit-displayName" onClick={handleInputClick} />
+          <AiFillEdit className=" edit-displayName" onClick={handleInputClick} />
           <div className="displayName-edit">
             <input
               type="text"
@@ -97,7 +145,18 @@ function Home() {
             )}
           </div>
         </div>
-
+        {/* <Avatar activePet={currentPet} /> */}
+        <div className="absolute top-80 inset-x-0 ">
+          <div className="absolute inset-x-1/3 top-14">
+            {/* ส่งข้อมูล activePet ที่ได้จากการดึงมา */}
+            <Avatar
+              className="custom-home-avatar-class"
+              activeHats={activeHats}
+              activeClothes={activeClothes}
+              activePet={currentPet}
+            />
+          </div>
+        </div>
         <div>
           <Link to={"/chatroom"}>
             <FaCirclePlay className="button-play" />

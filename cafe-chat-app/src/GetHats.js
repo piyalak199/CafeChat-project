@@ -116,7 +116,7 @@ export default function GetHats() {
                 <div className="col md-4">
                   <div className="card m-2 p-2" key={hat.hatID}>
                     {/* <div>Hat ID: {hat.hatID}</div> */}
-                    <div>Hat Name: {hat.hatName}</div>
+                    {/* <div>Hat Name: {hat.hatName}</div> */}
                     <div className="avatar-container">
                       <img
                         src={modelAvatar}

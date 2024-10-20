@@ -120,7 +120,7 @@ export default function GetDressed() {
                 return (
                   <div className="col md-4">
                     <div className="card m-2 p-2" key={cloth.clothID}>
-                      <div>Cloth Name: {cloth.clothName}</div>
+                      {/* <div>Cloth Name: {cloth.clothName}</div> */}
                       <div className="avatar-container">
                         {/* Model Avatar */}
                         <img

@@ -12,8 +12,9 @@
 
 
 .btn-selectpet:disabled {
-  background-color: #cccccc; /* Light gray for disabled state */
-  color: #666666; /* Darker gray for text */
+  background-color: #c35650; /* Light gray for disabled state */
+  border : 3px solid #650606;
+  color: #ffffff; /* Darker gray for text */
   cursor: not-allowed; /* Change cursor to indicate it's not clickable */
 }
 

@@ -43,12 +43,12 @@
 .button-pet {
   position: absolute;
   top: 74.6%;
-  left: 22.5%;
+  left: 19%;
   transform: translate(-50%, -50%);
   background-color: #c35650;
   border-radius: 20px;
   border: 1px solid #000000;
-  padding: 10px 25px;
+  padding: 7px 20px;
   text-align: center;
   color: white;
   font-size: 18px;
@@ -58,7 +58,7 @@
 
 .edit-displayName {
   position: absolute;
-  top: 45%;
+  top: 40%;
   left: 22%;
   transform: translate(-50%, -50%);
   text-align: center;
@@ -68,7 +68,7 @@
 
 .displayName-edit {
   position: absolute;
-  top: 45%;
+  top: 40%;
   left: 30%;
   transform: translate(-30%, -50%);
   text-align: left;
