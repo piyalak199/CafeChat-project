@@ -152,7 +152,8 @@ export default function ChatRoom() {
             <ul className="list-inline">
               {usersInRoom.map((user, index) => (
                 <li key={index} className="list-inline-item p-0 px-4">
-                  {user.displayName} (ID: {user.userID})
+                  {user.displayName} {/* (ID: {user.userID}) */}
+                  
                   <div className={`container`}>
                     <div className="row justify-content-md-center">
                       <div className="col col-lg-2">
