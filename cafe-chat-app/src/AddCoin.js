@@ -149,6 +149,10 @@ function AddCoin() {
                     src={QRCodeImage}
                     alt="QR Code"
                     className="img-fluid mb-3"
+                    style={{
+                      position: "relative",
+                      left: "60px", 
+                    }}
                   />
                   <p>{selectedCoin.coin} coin</p>
                   <p>{selectedCoin.price} บาท</p>

@@ -162,6 +162,13 @@ export default function ChatRoom() {
                               src={modelAvatar}
                               alt="Model Avatar"
                               className="avatar-image"
+                              style={{
+                                position: "absolute",
+                                top: "48%", // เลื่อนขึ้นลง
+                                left: "calc(50% + 100px)",
+                                transform: "translate(-50%, -48%)",
+                                zIndex: 0,
+                              }}
                             />
 
                             {/* แสดงหมวกที่ active */}
@@ -172,6 +179,13 @@ export default function ChatRoom() {
                                   alt={user.activeHat.hatName}
                                   width="100"
                                   className="hat-image"
+                                  style={{
+                                    position: "absolute",
+                                    top: "49%", // เลื่อนขึ้นลง
+                                    left: "calc(50% + 99px)",
+                                    transform: "translate(-50%, -80%)",
+                                    zIndex: 0,
+                                  }}
                                 />
                               </div>
                             )}
@@ -184,6 +198,13 @@ export default function ChatRoom() {
                                   alt={user.activeCloth.clothName}
                                   width="100"
                                   className="cloth-image "
+                                  style={{
+                                    position: "absolute",
+                                    top: "48%", // เลื่อนขึ้นลง
+                                    left: "calc(50% + 101px)",
+                                    transform: "translate(-50%, +163%)",
+                                    zIndex: 0,
+                                  }}
                                 />
                               </div>
                             )}
@@ -203,6 +224,13 @@ export default function ChatRoom() {
                               src={`http://localhost:3001/img/Pets/${user.petSelect.petImg}`}
                               alt="Active Pet"
                               className="pet-image "
+                              style={{
+                                position: "absolute",
+                                top: "49%", // เลื่อนขึ้นลง
+                                left: "calc(50% + 100px)",
+                                transform: "translate(-50%, +33%)",
+                                zIndex: 0,
+                              }}
                             />
                           </div>
                         )}
