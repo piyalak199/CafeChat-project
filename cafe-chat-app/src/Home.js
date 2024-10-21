@@ -6,6 +6,10 @@ import { FaCirclePlay } from "react-icons/fa6";
 import { API_POST, API_GET } from "./api"; // ใช้ฟังก์ชัน API_POST จาก api.js
 
 import bgHome from "./img/Home/bgHome.png";
+import frame01 from "./img/Home/frame01.PNG";
+import frame02 from "./img/Home/frame02.PNG";
+import Dress from "./img/Home/Dress.PNG";
+import Shop from "./img/Home/Shop.PNG";
 
 import "./Home.css";
 import NavbarUser from "./NavbarUser.js";
@@ -119,6 +123,70 @@ function Home() {
       <div className="container absolute inset-x-0 top-0">
         <NavbarUser />
         <div>
+          <img
+            src={frame01}
+            alt="Frame"
+            className="custom-frame-class"
+            style={{
+              position: "absolute",
+              top: "47%", // เลื่อนขึ้นลง
+              left: "calc(50% - 150px)",
+              transform: "translate(-50%, -50%)",
+              zIndex: 0,
+              width: "85%", // ปรับขนาด
+              height: "auto",
+              maxWidth: "none", // ทำให้ไม่จำกัดขนาดสูงสุด
+            }}
+          />
+
+          <img
+            src={frame02}
+            alt="Frame2"
+            className="custom-frame-class2"
+            style={{
+              position: "absolute",
+              top: "47%", // เลื่อนขึ้นลง
+              left: "calc(50% + 55px)",
+              transform: "translate(-50%, -50%)",
+              zIndex: 0,
+              width: "85%", // ปรับขนาด
+              height: "auto",
+              maxWidth: "none", // ทำให้ไม่จำกัดขนาดสูงสุด
+            }}
+          />
+
+          <img
+            src={Dress}
+            alt="Dress"
+            className="custom-dress-class"
+            style={{
+              position: "absolute",
+              top: "49%", // เลื่อนขึ้นลง
+              left: "calc(50% + 37px)",
+              transform: "translate(-50%, -50%)",
+              zIndex: 0,
+              width: "70%", // ปรับขนาด
+              height: "auto",
+              maxWidth: "none", // ทำให้ไม่จำกัดขนาดสูงสุด
+            }}
+          />
+
+          <img
+            src={Shop}
+            alt="Shop"
+            className="custom-shop-class"
+            style={{
+              position: "absolute",
+              top: "49%", // เลื่อนขึ้นลง
+              left: "calc(50% + 100px)",
+              transform: "translate(-50%, -50%)",
+              zIndex: 0,
+              width: "70%", // ปรับขนาด
+              height: "auto",
+              maxWidth: "none", // ทำให้ไม่จำกัดขนาดสูงสุด
+            }}
+          />
+
           <Link className="button-cloth" to="/gethats">
             แต่งตัว
           </Link>
@@ -131,7 +199,10 @@ function Home() {
         </Link>
 
         <div>
-          <AiFillEdit className=" edit-displayName" onClick={handleInputClick} />
+          <AiFillEdit
+            className=" edit-displayName"
+            onClick={handleInputClick}
+          />
           <div className="displayName-edit">
             <input
               type="text"

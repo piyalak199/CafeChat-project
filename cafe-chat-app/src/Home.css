@@ -90,4 +90,26 @@
   border: 1px solid #000000;
 }
 
+.custom-frame-class {
+  width: 100%; /* หรือขนาดตามที่ต้องการ */
+  max-width: 400px;
+  margin: 0 auto;
+}
 
+.custom-frame-class2 {
+  width: 100%; /* หรือขนาดตามที่ต้องการ */
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.custom-dress-class {
+  width: 100%; /* หรือขนาดตามที่ต้องการ */
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.custom-shop-class {
+  width: 100%; /* หรือขนาดตามที่ต้องการ */
+  max-width: 400px;
+  margin: 0 auto;
+}
