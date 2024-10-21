@@ -43,26 +43,39 @@ const io = new Server(server, {
 const roomUsers = {}; // Store user info (displayName, userID) in each room
 const userRooms = {}; // Store the room each user is in, along with their displayName and userID
 
+// Function to fetch impolite words from the database
+const getImpoliteWords = (callback) => {
+  const sql = `SELECT word FROM impolite_word`;
+  pool.query(sql, (error, results) => {
+    if (error) {
+      console.log("Error fetching impolite words:", error.message);
+      callback([]);
+    } else {
+      const words = results.map((row) => row.word);
+      callback(words);
+    }
+  });
+};
+
 const getPetSelect = (userID, callback) => {
   const sql = `
-SELECT
-      u.petTypeID,
-      p.petName,
-      p.petImg
-    FROM
-      user u
-    JOIN pettype p ON
-      u.petTypeID = p.petTypeID 
-    WHERE
-      u.userID = ?
-  `;
+  SELECT
+    u.petTypeID,
+    p.petName,
+    p.petImg
+  FROM
+    user u
+  JOIN pettype p ON
+    u.petTypeID = p.petTypeID 
+  WHERE
+    u.userID = ?`;
 
   pool.query(sql, [userID], (error, results) => {
     if (error) {
       console.log("Error fetching active pet:", error.message);
-      callback(null); // Return null if there's an error
+      callback(null);
     } else {
-      callback(results.length > 0 ? results[0] : null); // Return the active hat or null if none
+      callback(results.length > 0 ? results[0] : null);
     }
   });
 };
@@ -79,18 +92,18 @@ const getActiveHat = (userID, callback) => {
     JOIN user_hat uh ON
       uh.hatID = h.hatID
     WHERE
-      uh.hat_active = "y" AND uh.userID = ?
-  `;
+      uh.hat_active = "y" AND uh.userID = ?`;
 
   pool.query(sql, [userID], (error, results) => {
     if (error) {
       console.log("Error fetching active hat:", error.message);
-      callback(null); // Return null if there's an error
+      callback(null);
     } else {
-      callback(results.length > 0 ? results[0] : null); // Return the active hat or null if none
+      callback(results.length > 0 ? results[0] : null);
     }
   });
 };
+
 // Function to fetch the active cloth directly from the database
 const getActiveCloth = (userID, callback) => {
   const sql = `
@@ -103,15 +116,14 @@ const getActiveCloth = (userID, callback) => {
     JOIN user_cloth uh ON
       uh.clothID = h.clothID
     WHERE
-      uh.cloth_active = "y" AND uh.userID = ?
-  `;
+      uh.cloth_active = "y" AND uh.userID = ?`;
 
   pool.query(sql, [userID], (error, results) => {
     if (error) {
       console.log("Error fetching active cloth:", error.message);
-      callback(null); // Return null if there's an error
+      callback(null);
     } else {
-      callback(results.length > 0 ? results[0] : null); // Return the active cloth or null if none
+      callback(results.length > 0 ? results[0] : null);
     }
   });
 };
@@ -119,58 +131,71 @@ const getActiveCloth = (userID, callback) => {
 io.on("connection", (socket) => {
   console.log("A user connected:", socket.id);
 
-  // Join a specific chat room
   socket.on("joinRoom", ({ roomID, displayName, userID }) => {
-    socket.join(roomID);
-    userRooms[socket.id] = {
-      roomID,
-      displayName,
-      userID,
-    }; // Save userID and roomID for the connected socket
+    // Fetch the room limit for the room
+    const sql = `SELECT room_limit FROM chatroom WHERE roomID = ?`;
+    pool.query(sql, [roomID], (error, results) => {
+      if (error) {
+        console.log("Error fetching room limit:", error.message);
+        return;
+      }
 
-    if (!roomUsers[roomID]) {
-      roomUsers[roomID] = [];
-    }
+      if (results.length === 0) {
+        console.log(`Room ${roomID} not found.`);
+        return;
+      }
 
-    // Fetch the active hat and active cloth for this user directly from the database
-    getActiveHat(userID, (activeHat) => {
-      console.log(`Active hat for ${displayName} (ID: ${userID}):`, activeHat);
+      const roomLimit = results[0].room_limit;
 
-      // Fetch the active cloth for the user
-      getActiveCloth(userID, (activeCloth) => {
+      // Check the current number of users in the room
+      const currentRoomUsers = roomUsers[roomID] ? roomUsers[roomID].length : 0;
+
+      if (currentRoomUsers >= roomLimit) {
         console.log(
-          `Active cloth for ${displayName} (ID: ${userID}):`,
-          activeCloth
+          `${displayName} (ID: ${userID}) cannot join room ${roomID}: room limit exceeded.`
         );
-        getPetSelect(userID, (petSelect) => {
-          console.log(
-            `Selected pet for ${displayName} (ID: ${userID}):`,
-            petSelect
-          );
+        socket.emit("roomFull", {
+          message: "Room is full. You have been disconnected.",
+        });
+        socket.disconnect(); // Disconnect the user
+        return;
+      }
 
-          // Push an object that includes both displayName, userID, activeHat, and activeCloth
-          roomUsers[roomID].push({
-            displayName,
-            userID,
-            activeHat,
-            activeCloth,
-            petSelect,
+      socket.join(roomID);
+      userRooms[socket.id] = {
+        roomID,
+        displayName,
+        userID,
+      };
+
+      if (!roomUsers[roomID]) {
+        roomUsers[roomID] = [];
+      }
+
+      // Fetch the active hat and active cloth for this user
+      getActiveHat(userID, (activeHat) => {
+        getActiveCloth(userID, (activeCloth) => {
+          getPetSelect(userID, (petSelect) => {
+            roomUsers[roomID].push({
+              displayName,
+              userID,
+              activeHat,
+              activeCloth,
+              petSelect,
+            });
+
+            io.to(roomID).emit("updateUsersInRoom", roomUsers[roomID]);
+            console.log(`${displayName} (ID: ${userID}) joined room ${roomID}`);
           });
-
-          // Emit the updated list of users in the room, including displayName, userID, activeHat, and activeCloth
-          io.to(roomID).emit("updateUsersInRoom", roomUsers[roomID]);
-          console.log(`${displayName} (ID: ${userID}) joined room ${roomID}`);
         });
       });
     });
   });
 
-  // Leave a specific chat room
   socket.on("leaveRoom", ({ roomID, displayName, userID }) => {
     socket.leave(roomID);
 
     if (roomUsers[roomID]) {
-      // Filter out the user who left by matching both displayName and userID
       roomUsers[roomID] = roomUsers[roomID].filter(
         (user) => user.displayName !== displayName || user.userID !== userID
       );
@@ -184,7 +209,6 @@ io.on("connection", (socket) => {
     console.log(`${displayName} (ID: ${userID}) left room ${roomID}`);
   });
 
-  // Handle disconnect event
   socket.on("disconnect", () => {
     console.log("A user disconnected:", socket.id);
 
@@ -194,7 +218,6 @@ io.on("connection", (socket) => {
 
       socket.leave(roomID);
       if (roomUsers[roomID]) {
-        // Filter out the user who disconnected
         roomUsers[roomID] = roomUsers[roomID].filter(
           (user) => user.displayName !== displayName || user.userID !== userID
         );
@@ -215,9 +238,24 @@ io.on("connection", (socket) => {
 
   // Handle incoming messages
   socket.on("sendMessage", (message) => {
-    io.to(message.room).emit("message", {
-      sender: message.sender,
-      text: message.text,
+    // Fetch impolite words from the database
+    getImpoliteWords((impoliteWords) => {
+      const hasImpoliteWord = impoliteWords.some((word) =>
+        message.text.includes(word)
+      );
+
+      if (hasImpoliteWord) {
+        console.log(
+          "Message contains impolite words, not sending:",
+          message.text
+        );
+        return; // Do not send the message if it contains impolite words
+      }
+
+      io.to(message.room).emit("message", {
+        sender: message.sender,
+        text: message.text,
+      });
     });
   });
 });

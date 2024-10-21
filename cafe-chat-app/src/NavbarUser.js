@@ -54,11 +54,11 @@ const NavbarUser = () => {
               </div>
 
               {/* Notifications */}
-              <div className="me-3">
+              {/* <div className="me-3">
                 <Link to="/notifications">
                   <IoIosNotifications className="notifications-icon " />
                 </Link>
-              </div>
+              </div> */}
 
               {/* Profile Icon */}
               <div>

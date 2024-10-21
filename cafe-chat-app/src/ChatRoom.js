@@ -17,7 +17,6 @@ export default function ChatRoom() {
   const [currentRoomName, setCurrentRoomName] = useState(null);
   const [joinedRoom, setJoinedRoom] = useState(false);
   const [messages, setMessages] = useState([]);
-  const [messageInput, setMessageInput] = useState("");
   const [userName, setUserName] = useState(displayName);
   const [usersInRoom, setUsersInRoom] = useState([]);
 
@@ -27,6 +26,9 @@ export default function ChatRoom() {
   const [activeHat, setActiveHat] = useState(null); // State to hold active hat information\
   const [activeCloth, setActiveCloth] = useState(null); // State to hold active hat information
   const [petSelect, setPetSelect] = useState(null); // State to hold active hat information
+
+  const [messageInput, setMessageInput] = useState("");
+
 
   const scrollToBottom = () => {
     if (messagesEndRef.current) {
@@ -70,6 +72,13 @@ export default function ChatRoom() {
       userID: userID,
     });
 
+
+    // Listen for join error
+    newSocket.on("roomFull", (data) => {
+      alert(data.message);
+      window.location.reload(); // Refresh the page
+    });
+
     setCurrentRoom(room.roomID);
     setCurrentRoomName(room.roomName);
     setJoinedRoom(true);
@@ -83,7 +92,6 @@ export default function ChatRoom() {
     });
 
     newSocket.on("updateUsersInRoom", (users) => {
-      // Ensure each user includes their active hats, clothes, and pet
       const usersWithDetails = users.map((user) => ({
         ...user,
       }));
@@ -94,7 +102,7 @@ export default function ChatRoom() {
     // Listen for active hat information
     newSocket.on("activeHatInfo", (userInfo) => {
       if (userInfo.userID === userID) {
-        setActiveHat(userInfo.activeHat); // Set the active hat for the current user
+        setActiveHat(userInfo.activeHat);
         setActiveCloth(userInfo.activeCloth);
         setPetSelect(userInfo.petSelect);
       }
@@ -153,7 +161,6 @@ export default function ChatRoom() {
               {usersInRoom.map((user, index) => (
                 <li key={index} className="list-inline-item p-0 px-4">
                   {user.displayName} {/* (ID: {user.userID}) */}
-                  
                   <div className={`container`}>
                     <div className="row justify-content-md-center">
                       <div className="col col-lg-2">
@@ -194,7 +201,6 @@ export default function ChatRoom() {
 
                       {/* แสดงสัตว์เลี้ยงที่ active */}
                       <div className="col content-end">
-                        
                         {user.petSelect && (
                           <div
                             className={`w-16 position-absolute start-48 `} // ใช้ className เฉพาะในหน้า Home
@@ -242,7 +248,7 @@ export default function ChatRoom() {
                       <div className="row-span-1">
                         <h2 className="row">
                           {currentRoomName
-                            ? `Room: ${currentRoomName}`
+                            ? `Room: ${currentRoomName} `
                             : "Select a room to start chatting"}
                         </h2>
                       </div>
@@ -288,7 +294,6 @@ export default function ChatRoom() {
                           </div>
                         </div>
                       </div>
-
                       <div className="row-start-10 row-end-10">
                         <div className="position-relative">
                           <div className="input-group">
