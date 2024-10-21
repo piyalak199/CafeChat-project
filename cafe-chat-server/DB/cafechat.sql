@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.0
+-- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- Host: 127.0.0.1:8080
--- Generation Time: Aug 14, 2024 at 12:54 PM
--- Server version: 10.4.27-MariaDB
--- PHP Version: 7.4.33
+-- Host: 127.0.0.1
+-- Generation Time: Oct 21, 2024 at 01:57 PM
+-- Server version: 10.4.32-MariaDB
+-- PHP Version: 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -57,6 +57,18 @@ CREATE TABLE `cloth` (
   `clothCoin` int(3) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_thai_520_w2;
 
+--
+-- Dumping data for table `cloth`
+--
+
+INSERT INTO `cloth` (`clothID`, `clothName`, `clothImg`, `clothCoin`) VALUES
+(1, 'ชุดทหารเรือ', 'ชุดทหารเรือ.png', 25),
+(2, 'ชุดโบว์', 'ชุดโบว์.png', 20),
+(3, 'ชุดสีฟ้า', 'ชุดสีฟ้า.png', 15),
+(4, 'ชุดเอี๊ยม', 'ชุดเอี๊ยม.png', 25),
+(5, 'ชุดฮูดสีชมพู', 'ชุดฮูดสีชมพู.png', 20),
+(6, 'ชุดขาว', 'ชุดขาว.png', 15);
+
 -- --------------------------------------------------------
 
 --
@@ -70,16 +82,22 @@ CREATE TABLE `hat` (
   `hatCoin` int(3) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_thai_520_w2;
 
+--
+-- Dumping data for table `hat`
+--
+
+INSERT INTO `hat` (`hatID`, `hatName`, `hatImg`, `hatCoin`) VALUES
+(1, 'blacktop', 'blacktop.png', 20),
+(2, 'navy', 'navy.png', 25),
+(3, 'pink', 'pink.png', 15);
+
 -- --------------------------------------------------------
 
 --
 -- Table structure for table `impolite_word`
 --
-
-CREATE TABLE `impolite_word` (
-  `wordID` int(5) NOT NULL,
-  `word` varchar(50) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_thai_520_w2;
+-- Error reading structure for table cafechat.impolite_word: #1932 - Table &#039;cafechat.impolite_word&#039; doesn&#039;t exist in engine
+-- Error reading data for table cafechat.impolite_word: #1064 - You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near &#039;FROM `cafechat`.`impolite_word`&#039; at line 1
 
 -- --------------------------------------------------------
 
@@ -98,10 +116,10 @@ CREATE TABLE `pettype` (
 --
 
 INSERT INTO `pettype` (`petTypeID`, `petName`, `petImg`) VALUES
-(1, 'Cat', 'cat.png'),
-(2, 'dog', 'dog.png'),
-(3, 'rabbit', 'rabbit.png'),
-(4, 'fish', 'fish.png');
+(1, 'แมว', 'cat.png'),
+(2, 'สุนัข', 'dog.png'),
+(3, 'กระต่าย', 'rabbit.png'),
+(4, 'ปลา', 'fish.png');
 
 -- --------------------------------------------------------
 
@@ -154,6 +172,30 @@ CREATE TABLE `transaction_coin` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `typecoin`
+--
+
+CREATE TABLE `typecoin` (
+  `coinID` int(2) NOT NULL,
+  `coin` int(4) NOT NULL,
+  `price` int(4) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_thai_520_w2;
+
+--
+-- Dumping data for table `typecoin`
+--
+
+INSERT INTO `typecoin` (`coinID`, `coin`, `price`) VALUES
+(1, 20, 10),
+(2, 50, 25),
+(3, 90, 40),
+(4, 125, 55),
+(5, 160, 70),
+(6, 210, 85);
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `user`
 --
 
@@ -161,7 +203,7 @@ CREATE TABLE `user` (
   `userID` int(6) NOT NULL,
   `username` varchar(30) NOT NULL,
   `password` varchar(32) NOT NULL,
-  `displayName` varchar(10) NOT NULL,
+  `displayName` varchar(16) NOT NULL,
   `coin` int(5) NOT NULL,
   `petTypeID` int(6) NOT NULL,
   `roleID` int(2) NOT NULL
@@ -172,10 +214,11 @@ CREATE TABLE `user` (
 --
 
 INSERT INTO `user` (`userID`, `username`, `password`, `displayName`, `coin`, `petTypeID`, `roleID`) VALUES
-(1, 'piyalak', '1bbd886460827015e5d605ed44252251', 'bua', 50, 1, 1),
-(2, 'juthatip', 'bae5e3208a3c700e3db642b6631e95b9', 'mei', 40, 2, 1),
-(3, 'one', '2be9bd7a3434f7038ca27d1918de58bd', 'day', 19, 2, 1),
-(4, 'admin', 'admin001', '-', 0, 0, 2);
+(1, 'piyalak', '1bbd886460827015e5d605ed44252251', 'หมาน้อย', 95, 1, 1),
+(2, 'juthatip', 'bae5e3208a3c700e3db642b6631e95b9', 'ทาสแมว', 0, 4, 1),
+(3, 'one', '81dc9bdb52d04dc20036dbd8313ed055', 'น้องปลาทอง', 10, 4, 1),
+(9, 'we', '81dc9bdb52d04dc20036dbd8313ed055', 'we love dogs', 0, 1, 1),
+(10, 'b', '25d55ad283aa400af464c76d713c07ad', 'bb', 0, 1, 1);
 
 -- --------------------------------------------------------
 
@@ -186,9 +229,24 @@ INSERT INTO `user` (`userID`, `username`, `password`, `displayName`, `coin`, `pe
 CREATE TABLE `user_cloth` (
   `UclothID` int(5) NOT NULL,
   `userID` int(6) NOT NULL,
-  `hatID` int(5) NOT NULL,
-  `hat_active` char(1) NOT NULL
+  `clothID` int(5) NOT NULL,
+  `cloth_active` char(1) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_thai_520_w2;
+
+--
+-- Dumping data for table `user_cloth`
+--
+
+INSERT INTO `user_cloth` (`UclothID`, `userID`, `clothID`, `cloth_active`) VALUES
+(1, 1, 1, 'n'),
+(2, 1, 5, 'y'),
+(4, 2, 4, 'y'),
+(5, 3, 5, 'n'),
+(7, 1, 4, 'n'),
+(8, 2, 3, 'n'),
+(9, 1, 3, 'n'),
+(10, 1, 2, 'n'),
+(11, 3, 1, 'y');
 
 -- --------------------------------------------------------
 
@@ -202,6 +260,18 @@ CREATE TABLE `user_hat` (
   `hatID` int(5) NOT NULL,
   `hat_active` char(1) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_thai_520_w2;
+
+--
+-- Dumping data for table `user_hat`
+--
+
+INSERT INTO `user_hat` (`UhatID`, `userID`, `hatID`, `hat_active`) VALUES
+(26, 2, 3, 'n'),
+(27, 2, 2, 'y'),
+(28, 3, 1, 'n'),
+(32, 1, 1, 'n'),
+(34, 1, 3, 'y'),
+(35, 3, 2, 'y');
 
 --
 -- Indexes for dumped tables
@@ -226,12 +296,6 @@ ALTER TABLE `hat`
   ADD PRIMARY KEY (`hatID`);
 
 --
--- Indexes for table `impolite_word`
---
-ALTER TABLE `impolite_word`
-  ADD PRIMARY KEY (`wordID`);
-
---
 -- Indexes for table `pettype`
 --
 ALTER TABLE `pettype`
@@ -254,6 +318,12 @@ ALTER TABLE `transaction_chat`
 --
 ALTER TABLE `transaction_coin`
   ADD PRIMARY KEY (`TCoinID`);
+
+--
+-- Indexes for table `typecoin`
+--
+ALTER TABLE `typecoin`
+  ADD PRIMARY KEY (`coinID`);
 
 --
 -- Indexes for table `user`
@@ -281,25 +351,19 @@ ALTER TABLE `user_hat`
 -- AUTO_INCREMENT for table `chatroom`
 --
 ALTER TABLE `chatroom`
-  MODIFY `roomID` int(2) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `roomID` int(2) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `cloth`
 --
 ALTER TABLE `cloth`
-  MODIFY `clothID` int(5) NOT NULL AUTO_INCREMENT;
+  MODIFY `clothID` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `hat`
 --
 ALTER TABLE `hat`
-  MODIFY `hatID` int(5) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `impolite_word`
---
-ALTER TABLE `impolite_word`
-  MODIFY `wordID` int(5) NOT NULL AUTO_INCREMENT;
+  MODIFY `hatID` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `pettype`
@@ -323,25 +387,31 @@ ALTER TABLE `transaction_chat`
 -- AUTO_INCREMENT for table `transaction_coin`
 --
 ALTER TABLE `transaction_coin`
-  MODIFY `TCoinID` int(5) NOT NULL AUTO_INCREMENT;
+  MODIFY `TCoinID` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `typecoin`
+--
+ALTER TABLE `typecoin`
+  MODIFY `coinID` int(2) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `user`
 --
 ALTER TABLE `user`
-  MODIFY `userID` int(6) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `userID` int(6) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT for table `user_cloth`
 --
 ALTER TABLE `user_cloth`
-  MODIFY `UclothID` int(5) NOT NULL AUTO_INCREMENT;
+  MODIFY `UclothID` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT for table `user_hat`
 --
 ALTER TABLE `user_hat`
-  MODIFY `UhatID` int(5) NOT NULL AUTO_INCREMENT;
+  MODIFY `UhatID` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=36;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
