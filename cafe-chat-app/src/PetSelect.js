@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { API_GET, API_POST } from "./api";
 import NavbarUser from "./NavbarUser.js";
-import Avatar from "./Avatar";  // Import Avatar
+import Avatar from "./Avatar"; // Import Avatar
 import "./PetSelect.css";
 
 function PetSelect() {
@@ -11,7 +11,7 @@ function PetSelect() {
   const [currentPetTypeID, setCurrentPetTypeID] = useState(
     localStorage.getItem("petTypeID")
   );
-  const [currentPet, setCurrentPet] = useState(null);  // Store current pet object
+  const [currentPet, setCurrentPet] = useState(null); // Store current pet object
   const [activeHats, setActiveHats] = useState([]);
   const [activeClothes, setActiveClothes] = useState([]);
   useEffect(() => {
@@ -36,7 +36,7 @@ function PetSelect() {
         }
       } catch (error) {
         console.error("Error fetching active items:", error);
-      } 
+      }
     };
 
     fetchActiveItems();
@@ -53,7 +53,7 @@ function PetSelect() {
             (pet) => pet.petTypeID === parseInt(savedPetTypeID)
           );
           if (selectedPet) {
-            setCurrentPet(selectedPet);  // Set the current selected pet object
+            setCurrentPet(selectedPet); // Set the current selected pet object
           }
         } else {
           const userResponse = await API_GET(`user/${userID}`);
@@ -66,7 +66,7 @@ function PetSelect() {
               (pet) => pet.petTypeID === userPetTypeID
             );
             if (selectedPet) {
-              setCurrentPet(selectedPet);  // Set the current selected pet object
+              setCurrentPet(selectedPet); // Set the current selected pet object
             }
           }
         }
@@ -98,7 +98,7 @@ function PetSelect() {
         (pet) => pet.petTypeID === newPetTypeID
       );
       if (selectedPet) {
-        setCurrentPet(selectedPet);  // Update the current selected pet object
+        setCurrentPet(selectedPet); // Update the current selected pet object
       }
     } catch (error) {
       console.error("Error updating pet type:", error);
@@ -109,12 +109,22 @@ function PetSelect() {
     <div className="container absolute inset-x-0 top-0">
       <NavbarUser />
       <div className="row flex justify-center">
-        <div className="col-md-auto text-center">
-          <div>
-            สัตว์เลี้ยงของคุณ:{" "}
-            {currentPet ? `${currentPet.petName}` : "ยังไม่ได้เลือก"}
-          </div>
+        <div className="col-md-auto text-center m-24">
+          <h1>
+            เลือกสัตว์เลี้ยงของคุณ
+            {/* สัตว์เลี้ยงของคุณ:{" "}
+            {currentPet ? `${currentPet.petName}` : "ยังไม่ได้เลือก"} */}
+          </h1>
         </div>
+        <div className="row flex justify-center">
+          <div className="col text-center ">
+          <Avatar
+            activeHats={activeHats}
+            activeClothes={activeClothes}
+            activePet={currentPet}
+          />
+          </div>
+        </div >
       </div>
       <div className="row flex justify-center">
         {petTypes.map((pet) => (
@@ -137,10 +147,6 @@ function PetSelect() {
           </div>
         ))}
       </div>
-
-      {/* แสดง Avatar และส่งข้อมูลสัตว์เลี้ยงที่เลือก */}
-      <Avatar activeHats={activeHats} activeClothes={activeClothes} activePet={currentPet}/>
-      {/* <Avatar  activePet={currentPet} /> */}
     </div>
   );
 }

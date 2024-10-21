@@ -32,7 +32,84 @@ const server = app.listen(port, () => {
   console.log(`Server running at ${port}`);
 });
 
-const { Server } = require("socket.io");
+  // const { Server } = require("socket.io");
+  // const io = new Server(server, {
+  //   cors: {
+  //     origin: "http://localhost:3000",
+  //     methods: ["GET", "POST"],
+  //   },
+  // });
+
+  // const roomUsers = {}; // เก็บรายชื่อผู้ใช้ในแต่ละห้อง
+  // const userRooms = {}; // เก็บห้องที่ผู้ใช้แต่ละคนอยู่
+
+  // io.on("connection", (socket) => {
+  //   console.log("A user connected:", socket.id);
+
+  //   // Join a specific chat room
+  //   socket.on("joinRoom", ({ roomID, displayName, userID }) => {
+  //     socket.join(roomID);
+  //     userRooms[socket.id] = { roomID, displayName, userID }; // Save userID
+
+  //     if (!roomUsers[roomID]) {
+  //       roomUsers[roomID] = [];
+  //     }
+  //     roomUsers[roomID].push(displayName);
+
+  //     io.to(roomID).emit("updateUsersInRoom", roomUsers[roomID]);
+  //     console.log(`${displayName} (ID: ${userID}) joined room ${roomID}`);
+  //   });
+
+  
+
+  //   // Leave a specific chat room
+  //   socket.on("leaveRoom", ({ roomID, displayName, userID }) => {
+  //     socket.leave(roomID);
+  //     if (roomUsers[roomID]) {
+  //       roomUsers[roomID] = roomUsers[roomID].filter((user) => user !== displayName);
+  //       if (roomUsers[roomID].length === 0) {
+  //         delete roomUsers[roomID];
+  //       }
+  //     }
+
+  //     io.to(roomID).emit("updateUsersInRoom", roomUsers[roomID]);
+  //     console.log(`${displayName} (ID: ${userID}) left room ${roomID}`);
+  //   });
+
+  //   // Handle disconnect event
+  //   socket.on("disconnect", () => {
+  //     console.log("A user disconnected:", socket.id);
+
+  //     const userRoom = userRooms[socket.id];
+  //     if (userRoom) {
+  //       const { roomID, displayName, userID } = userRoom;
+
+  //       socket.leave(roomID);
+  //       if (roomUsers[roomID]) {
+  //         roomUsers[roomID] = roomUsers[roomID].filter((user) => user !== displayName);
+  //         if (roomUsers[roomID].length === 0) {
+  //           delete roomUsers[roomID];
+  //         }
+  //       }
+
+  //       io.to(roomID).emit("updateUsersInRoom", roomUsers[roomID]);
+  //       console.log(`${displayName} (ID: ${userID}) disconnected and left room ${roomID}`);
+  //     }
+
+  //     delete userRooms[socket.id];
+  //   });
+
+  //   // Handle incoming messages
+  //   socket.on("sendMessage", (message) => {
+  //     io.to(message.room).emit("message", {
+  //       sender: message.sender,
+  //       text: message.text,
+  //     });
+  //   });
+  // });
+
+
+  const { Server } = require("socket.io");
 const io = new Server(server, {
   cors: {
     origin: "http://localhost:3000",
@@ -40,76 +117,73 @@ const io = new Server(server, {
   },
 });
 
-const roomUsers = {}; // เก็บรายชื่อผู้ใช้ในแต่ละห้อง
-const userRooms = {}; // เก็บห้องที่ผู้ใช้แต่ละคนอยู่
+const roomUsers = {}; // Store user info (displayName, userID) in each room
+const userRooms = {}; // Store the room each user is in, along with their displayName and userID
 
 io.on("connection", (socket) => {
   console.log("A user connected:", socket.id);
 
   // Join a specific chat room
-  socket.on("joinRoom", ({ roomID, displayName }) => {
+  socket.on("joinRoom", ({ roomID, displayName, userID, active_hat, active_cloth }) => {
     socket.join(roomID);
+    userRooms[socket.id] = { roomID, displayName, userID, active_hat, active_cloth }; // Save userID and roomID for the connected socket
 
-    // เก็บห้องที่ผู้ใช้อยู่
-    userRooms[socket.id] = { roomID, displayName };
-
-    // เพิ่มผู้ใช้ในห้องนั้น
     if (!roomUsers[roomID]) {
       roomUsers[roomID] = [];
     }
-    roomUsers[roomID].push(displayName);
+    
+    // Push an object that includes both displayName and userID
+    roomUsers[roomID].push({ displayName, userID, active_hat, active_cloth });
 
-    // ส่งรายชื่อผู้ใช้ในห้องกลับไปยัง Client
+    // Emit the updated list of users in the room, including both displayName and userID
     io.to(roomID).emit("updateUsersInRoom", roomUsers[roomID]);
-    console.log(`${displayName} joined room ${roomID}`);
+    console.log(`${displayName} (ID: ${userID}) joined room ${roomID}(hat: ${active_hat}) (cloth: ${active_cloth})`);
   });
 
   // Leave a specific chat room
-  socket.on("leaveRoom", ({ roomID, displayName }) => {
+  socket.on("leaveRoom", ({ roomID, displayName, userID, active_hat, active_cloth }) => {
     socket.leave(roomID);
 
-    // ลบผู้ใช้ออกจากห้อง
     if (roomUsers[roomID]) {
+      // Filter out the user who left by matching both displayName and userID
       roomUsers[roomID] = roomUsers[roomID].filter(
-        (user) => user !== displayName
+        (user) => user.displayName !== displayName || user.userID !== userID || user.active_hat !== active_hat || user.active_cloth !== active_cloth
       );
+
       if (roomUsers[roomID].length === 0) {
-        delete roomUsers[roomID]; // ถ้าไม่มีผู้ใช้ในห้องแล้ว ให้ลบห้องออกจาก roomUsers
+        delete roomUsers[roomID];
       }
     }
 
-    // ส่งรายชื่อผู้ใช้ที่เหลือในห้องกลับไปยัง Client
     io.to(roomID).emit("updateUsersInRoom", roomUsers[roomID]);
-    console.log(`${displayName} left room ${roomID}`);
+    console.log(`${displayName} (ID: ${userID}) left room ${roomID}`);
   });
 
   // Handle disconnect event
   socket.on("disconnect", () => {
     console.log("A user disconnected:", socket.id);
 
-    // ตรวจสอบว่าผู้ใช้มีห้องที่อยู่หรือไม่
     const userRoom = userRooms[socket.id];
     if (userRoom) {
-      const { roomID, displayName } = userRoom;
+      const { roomID, displayName, userID, active_hat, active_cloth } = userRoom;
 
-      // เรียก leaveRoom เมื่อผู้ใช้ disconnect
       socket.leave(roomID);
-
       if (roomUsers[roomID]) {
+        // Filter out the user who disconnected
         roomUsers[roomID] = roomUsers[roomID].filter(
-          (user) => user !== displayName
+          (user) => user.displayName !== displayName || user.userID !== userID || user.active_hat !== active_hat || user.active_cloth !== active_cloth
         );
+
         if (roomUsers[roomID].length === 0) {
-          delete roomUsers[roomID]; // ถ้าไม่มีผู้ใช้ในห้องแล้ว ให้ลบห้องออกจาก roomUsers
+          delete roomUsers[roomID];
         }
       }
 
-      // ส่งรายชื่อผู้ใช้ที่เหลือในห้องกลับไปยัง Client
       io.to(roomID).emit("updateUsersInRoom", roomUsers[roomID]);
-      console.log(`${displayName} disconnected and left room ${roomID}`);
+      console.log(`${displayName} (ID: ${userID}) disconnected and left room ${roomID}`);
+      // console.log(`(hat: ${active_hat}) (cloth: ${active_cloth})`);
     }
 
-    // ลบข้อมูลห้องของผู้ใช้ที่ตัดการเชื่อมต่อ
     delete userRooms[socket.id];
   });
 
@@ -217,7 +291,7 @@ app.post("/api/access_request", (req, res) => {
 
   if (decoded) {
     const query =
-      "SELECT a.userID, a.username, a.displayName, a.coin ,a.petTypeID, p.petName, p.petImg, r.roleID, r.roleName " +
+      "SELECT a.userID, a.username, a.displayName, a.coin ,a.petTypeID, p.petName, p.petImg, r.roleID, r.roleName, a.active_hat, a.active_cloth " +
       "FROM user a " +
       "INNER JOIN pettype p ON (a.petTypeID = p.petTypeID) " +
       "INNER JOIN roles r ON (a.roleID = r.roleID) " +
@@ -239,6 +313,8 @@ app.post("/api/access_request", (req, res) => {
             coin: results[0].coin,
             petTypeID: results[0].petTypeID,
             roleID: results[0].roleID,
+            active_hat: results[0].active_hat,
+            active_cloth: results[0].active_cloth
           };
           const accessToken = jwt.sign(payload, "MySecretKey");
           response = {
@@ -884,3 +960,136 @@ app.post("/api/updateAddCoin", async (req, res) => {
     res.status(500).json({ success: false, message: "Internal server error." });
   }
 });
+
+// // ฟังก์ชันเพื่อดึงข้อมูลหมวกที่ active ของผู้ใช้ทั้งหมด
+// app.get("/api/active-hats", async (req, res) => {
+//   const sql = `
+//     SELECT
+//       h.hatID,
+//       h.hatName,
+//       h.hatImg,
+//       uh.hat_active,
+//       uh.userID
+//     FROM
+//       hat h
+//     JOIN user_hat uh ON
+//       uh.hatID = h.hatID
+//     WHERE
+//       uh.hat_active = "y"
+//   `;
+  
+//   pool.query(sql, (error, results) => {
+//     if (error) {
+//       return res.json({
+//         result: false,
+//         message: error.message,
+//       });
+//     }
+//     return res.json({
+//       result: true,
+//       data: results,
+//     });
+//   });
+// });
+
+app.get("/api/active-hats", async (req, res) => {
+  const { userID } = req.query; // Get the userID from query parameters
+
+  if (!userID) {
+    return res.json({
+      result: false,
+      message: "Missing userID",
+    });
+  }
+
+  const sql = `
+    SELECT
+      h.hatID,
+      h.hatName,
+      h.hatImg,
+      uh.hat_active,
+      uh.userID
+    FROM
+      hat h
+    JOIN user_hat uh ON
+      uh.hatID = h.hatID
+    WHERE
+      uh.hat_active = "y"
+      AND uh.userID = ?
+  `;
+  
+  pool.query(sql, [userID], (error, results) => {
+    if (error) {
+      return res.json({
+        result: false,
+        message: error.message,
+      });
+    }
+    return res.json({
+      result: true,
+      data: results.length > 0 ? results[0] : null, // Return the active hat or null if not found
+    });
+  });
+});
+
+
+// ฟังก์ชันเพื่อดึงข้อมูลเสื้อผ้าที่ active ของผู้ใช้ทั้งหมด
+app.get("/api/active-clothes", async (req, res) => {
+  const sql = `
+    SELECT
+      h.clothID,
+      h.clothName,
+      h.clothImg,
+      uh.cloth_active,
+      uh.userID
+    FROM
+      cloth h
+    JOIN user_cloth uh ON
+      uh.clothID = h.clothID
+    WHERE
+      uh.cloth_active = "y"
+  `;
+
+  pool.query(sql, (error, results) => {
+    if (error) {
+      return res.json({
+        result: false,
+        message: error.message,
+      });
+    }
+    return res.json({
+      result: true,
+      data: results,
+    });
+  });
+});
+
+// ฟังก์ชันเพื่อดึงข้อมูลผู้ใช้พร้อมกับข้อมูลประเภทสัตว์เลี้ยง
+app.get("/api/user-pets", async (req, res) => {
+  const sql = `
+    SELECT
+      u.userID,
+      u.petTypeID,
+      p.petName,
+      p.petImg
+    FROM
+      user u
+    JOIN pettype p ON 
+      u.petTypeID = p.petTypeID
+  `;
+  
+  pool.query(sql, (error, results) => {
+    if (error) {
+      return res.json({
+        result: false,
+        message: error.message,
+      });
+    }
+    return res.json({
+      result: true,
+      data: results,
+    });
+  });
+});
+
+

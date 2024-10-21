@@ -78,6 +78,8 @@ function Login() {
           "petTypeID",
           accessData.data.account_info.petTypeID
         );
+        localStorage.setItem("active_hat", accessData.data.account_info.active_hat);
+        localStorage.setItem("active_cloth", accessData.data.account_info.active_cloth);
         localStorage.setItem("roleID", accessData.data.account_info.roleID);
 
         navigate("/home", { replace: true });

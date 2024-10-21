@@ -1,12 +1,19 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { io } from "socket.io-client";
+import { API_POST, API_GET } from "./api"; // ใช้ฟังก์ชัน API_POST จาก api.js
 
 import "./ChatRoom.css";
 import NavbarUser from "./NavbarUser.js";
+import Avatar from "./Avatar"; // Import the Avatar component
 
 export default function ChatRoom() {
   const displayName = localStorage.getItem("displayName");
+  const userID = localStorage.getItem("userID");
+  const active_hat = localStorage.getItem("active_hat");
+  const active_cloth = localStorage.getItem("active_cloth");
+  const petTypeID = localStorage.getItem("petTypeID");
+
   const { roomID } = useParams();
   const navigate = useNavigate();
   const [chatRooms, setChatRooms] = useState([]);
@@ -15,22 +22,18 @@ export default function ChatRoom() {
   const [joinedRoom, setJoinedRoom] = useState(false);
   const [messages, setMessages] = useState([]);
   const [messageInput, setMessageInput] = useState("");
-  const [userName, setUserName] = useState(displayName);
-  const [usersInRoom, setUsersInRoom] = useState([]); // เก็บรายชื่อผู้ใช้ในห้อง
+  // const [userName, setUserName] = useState(displayName);
+  const [usersInRoom, setUsersInRoom] = useState([]);
   const messagesEndRef = useRef(null);
   const [socket, setSocket] = useState(null);
 
+  const [loading, setLoading] = useState(true);
+
   const scrollToBottom = () => {
     if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({
-        behavior: "smooth",
-      });
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
   };
-
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
 
   useEffect(() => {
     // Fetch chat rooms
@@ -45,13 +48,15 @@ export default function ChatRoom() {
       }
     };
   }, [socket]);
-
   const handleJoinRoom = (room) => {
     if (currentRoom) {
       if (socket) {
         socket.emit("leaveRoom", {
           roomID: currentRoom,
-          displayName: userName,
+          displayName: displayName,
+          userID: userID,
+          active_hat: active_hat,
+          active_cloth: active_cloth,
         });
         setJoinedRoom(false);
         socket.disconnect();
@@ -61,15 +66,19 @@ export default function ChatRoom() {
     const newSocket = io.connect("http://localhost:3001");
     setSocket(newSocket);
 
-    // Join the new room and notify others
-    newSocket.emit("joinRoom", { roomID: room.roomID, displayName: userName });
+    newSocket.emit("joinRoom", {
+      roomID: room.roomID,
+      displayName: displayName + "...",
+      userID: userID,
+      active_hat: active_hat,
+      active_cloth: active_cloth,
+    });
 
     setCurrentRoom(room.roomID);
     setCurrentRoomName(room.roomName);
     setJoinedRoom(true);
     setMessages([]);
 
-    // Listen for incoming messages
     newSocket.on("message", (message) => {
       setMessages((prevMessages) => [
         ...prevMessages,
@@ -77,9 +86,12 @@ export default function ChatRoom() {
       ]);
     });
 
-    // Listen for updated user list in the room
     newSocket.on("updateUsersInRoom", (users) => {
-      setUsersInRoom(users); // อัปเดตรายชื่อผู้ใช้ในห้อง
+      const usersWithDetails = users.map((user) => ({
+        ...user,
+      }));
+
+      setUsersInRoom(usersWithDetails);
     });
 
     navigate(`/chatroom/${room.roomID}`);
@@ -90,7 +102,10 @@ export default function ChatRoom() {
       if (socket) {
         socket.emit("leaveRoom", {
           roomID: currentRoom,
-          displayName: userName,
+          displayName: displayName,
+          userID: userID,
+          active_hat: active_hat,
+          active_cloth: active_cloth,
         });
         socket.disconnect();
       }
@@ -98,7 +113,7 @@ export default function ChatRoom() {
       setCurrentRoomName(null);
       setJoinedRoom(false);
       setMessages([]);
-      setUsersInRoom([]); // เคลียร์รายชื่อผู้ใช้
+      setUsersInRoom([]);
       navigate("/chatroom");
     }
   };
@@ -107,7 +122,7 @@ export default function ChatRoom() {
     if (messageInput.trim() !== "" && currentRoom && socket) {
       const message = {
         room: currentRoom,
-        sender: userName,
+        sender: displayName,
         text: messageInput,
       };
 
@@ -116,6 +131,12 @@ export default function ChatRoom() {
     }
   };
 
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+  useEffect(() => {
+    console.log(usersInRoom); // Check the structure of usersInRoom
+  }, [usersInRoom]);
   return (
     <div>
       <div className="container absolute inset-x-0 top-0">
@@ -123,18 +144,20 @@ export default function ChatRoom() {
 
         <div className="flex justify-center">
           <div className="border-b border-black h-32 w-full mx-40 mb-10 rounded-0">
-            {/* แสดงรายชื่อผู้ใช้ในห้อง */}
-            <div>
-              <h4>Users in room:</h4>
-              <ul className="list-inline">
-                {usersInRoom.map((user, index) => (
-                  <li key={index} className="list-inline-item p-16">
-                    {user}
-                  </li>
-                ))}
-              </ul>
-            </div>
-
+            <h4>Users in room:</h4>
+            <ul className="list-inline">
+              {usersInRoom.map((user, index) => (
+                <li key={index} className="list-inline-item p-16">
+                  {user.displayName} (ID: {user.userID})
+                  (HatID: {user.active_hat}) (ClothID: {user.active_cloth})
+                  <Avatar
+                    // activeHats={activeHats} // User's active hats
+                    // activeClothes={activeClothes} // User's active clothes
+                    // activePet={user.petTypeID} // User's selected pet
+                  />
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
 
@@ -150,7 +173,6 @@ export default function ChatRoom() {
                     {room.roomName}
                   </button>
                 ))}
-
                 <button onClick={handleLeaveRoom}>Leave Room</button>
               </div>
             </div>
@@ -176,7 +198,7 @@ export default function ChatRoom() {
                               <div
                                 key={index}
                                 className={`flex ${
-                                  msg.sender === userName
+                                  msg.sender === displayName
                                     ? "justify-end"
                                     : "justify-start"
                                 } mb-2`}
@@ -185,19 +207,19 @@ export default function ChatRoom() {
                                   <div>
                                     <small
                                       className={`text-xs text-gray-600 ${
-                                        msg.sender === userName
+                                        msg.sender === displayName
                                           ? "float-right"
                                           : "float-left"
                                       }`}
                                     >
-                                      {msg.sender === userName
+                                      {msg.sender === displayName
                                         ? "You"
                                         : msg.sender}
                                     </small>
                                   </div>
                                   <div
                                     className={`${
-                                      msg.sender === userName
+                                      msg.sender === displayName
                                         ? "bg-blue-500 text-white"
                                         : "bg-gray-300 text-black"
                                     } p-2 rounded-lg max-w-xs break-words clear-both`}
