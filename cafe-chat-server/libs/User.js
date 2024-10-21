@@ -98,5 +98,12 @@ module.exports = {
     return await pool.query(sql);
   },
 
+  addUserCloth: async (pool, userID, clothID) => {
+    var sql =
+      'INSERT INTO cloth( clothName, clothImg, clothCoin) VALUES (?,?,?)';
+    sql = mysql.format(sql, [userID, clothID]);
+
+    return await pool.query(sql);
+  },
   
 };

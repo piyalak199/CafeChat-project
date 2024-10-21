@@ -1,18 +1,14 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { io } from "socket.io-client";
-import { API_POST, API_GET } from "./api"; // ใช้ฟังก์ชัน API_POST จาก api.js
 
 import "./ChatRoom.css";
 import NavbarUser from "./NavbarUser.js";
-import Avatar from "./Avatar"; // Import the Avatar component
+import modelAvatar from "./img/Shop/model.png";
 
 export default function ChatRoom() {
   const displayName = localStorage.getItem("displayName");
   const userID = localStorage.getItem("userID");
-  const active_hat = localStorage.getItem("active_hat");
-  const active_cloth = localStorage.getItem("active_cloth");
-  const petTypeID = localStorage.getItem("petTypeID");
 
   const { roomID } = useParams();
   const navigate = useNavigate();
@@ -22,12 +18,15 @@ export default function ChatRoom() {
   const [joinedRoom, setJoinedRoom] = useState(false);
   const [messages, setMessages] = useState([]);
   const [messageInput, setMessageInput] = useState("");
-  // const [userName, setUserName] = useState(displayName);
+  const [userName, setUserName] = useState(displayName);
   const [usersInRoom, setUsersInRoom] = useState([]);
+
   const messagesEndRef = useRef(null);
   const [socket, setSocket] = useState(null);
 
-  const [loading, setLoading] = useState(true);
+  const [activeHat, setActiveHat] = useState(null); // State to hold active hat information\
+  const [activeCloth, setActiveCloth] = useState(null); // State to hold active hat information
+  const [petSelect, setPetSelect] = useState(null); // State to hold active hat information
 
   const scrollToBottom = () => {
     if (messagesEndRef.current) {
@@ -48,15 +47,14 @@ export default function ChatRoom() {
       }
     };
   }, [socket]);
+
   const handleJoinRoom = (room) => {
     if (currentRoom) {
       if (socket) {
         socket.emit("leaveRoom", {
           roomID: currentRoom,
-          displayName: displayName,
+          displayName: userName,
           userID: userID,
-          active_hat: active_hat,
-          active_cloth: active_cloth,
         });
         setJoinedRoom(false);
         socket.disconnect();
@@ -68,10 +66,8 @@ export default function ChatRoom() {
 
     newSocket.emit("joinRoom", {
       roomID: room.roomID,
-      displayName: displayName + "...",
+      displayName: userName,
       userID: userID,
-      active_hat: active_hat,
-      active_cloth: active_cloth,
     });
 
     setCurrentRoom(room.roomID);
@@ -87,11 +83,21 @@ export default function ChatRoom() {
     });
 
     newSocket.on("updateUsersInRoom", (users) => {
+      // Ensure each user includes their active hats, clothes, and pet
       const usersWithDetails = users.map((user) => ({
         ...user,
       }));
 
       setUsersInRoom(usersWithDetails);
+    });
+
+    // Listen for active hat information
+    newSocket.on("activeHatInfo", (userInfo) => {
+      if (userInfo.userID === userID) {
+        setActiveHat(userInfo.activeHat); // Set the active hat for the current user
+        setActiveCloth(userInfo.activeCloth);
+        setPetSelect(userInfo.petSelect);
+      }
     });
 
     navigate(`/chatroom/${room.roomID}`);
@@ -102,10 +108,8 @@ export default function ChatRoom() {
       if (socket) {
         socket.emit("leaveRoom", {
           roomID: currentRoom,
-          displayName: displayName,
+          displayName: userName,
           userID: userID,
-          active_hat: active_hat,
-          active_cloth: active_cloth,
         });
         socket.disconnect();
       }
@@ -114,6 +118,9 @@ export default function ChatRoom() {
       setJoinedRoom(false);
       setMessages([]);
       setUsersInRoom([]);
+      setActiveHat(null); // Clear active hat when leaving the room
+      setActiveCloth(null);
+      setPetSelect(null);
       navigate("/chatroom");
     }
   };
@@ -122,7 +129,7 @@ export default function ChatRoom() {
     if (messageInput.trim() !== "" && currentRoom && socket) {
       const message = {
         room: currentRoom,
-        sender: displayName,
+        sender: userName,
         text: messageInput,
       };
 
@@ -134,9 +141,7 @@ export default function ChatRoom() {
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
-  useEffect(() => {
-    console.log(usersInRoom); // Check the structure of usersInRoom
-  }, [usersInRoom]);
+
   return (
     <div>
       <div className="container absolute inset-x-0 top-0">
@@ -144,17 +149,66 @@ export default function ChatRoom() {
 
         <div className="flex justify-center">
           <div className="border-b border-black h-32 w-full mx-40 mb-10 rounded-0">
-            <h4>Users in room:</h4>
             <ul className="list-inline">
               {usersInRoom.map((user, index) => (
-                <li key={index} className="list-inline-item p-16">
+                <li key={index} className="list-inline-item p-0 px-4">
                   {user.displayName} (ID: {user.userID})
-                  (HatID: {user.active_hat}) (ClothID: {user.active_cloth})
-                  <Avatar
-                    // activeHats={activeHats} // User's active hats
-                    // activeClothes={activeClothes} // User's active clothes
-                    // activePet={user.petTypeID} // User's selected pet
-                  />
+                  <div className={`container`}>
+                    <div className="row justify-content-md-center">
+                      <div className="col col-lg-2">
+                        <div className="avatar-container">
+                          <div>
+                            <img
+                              src={modelAvatar}
+                              alt="Model Avatar"
+                              className="avatar-image"
+                            />
+
+                            {/* แสดงหมวกที่ active */}
+                            {user.activeHat && (
+                              <div>
+                                <img
+                                  src={`http://localhost:3001/img/Hat/${user.activeHat.hatImg}`}
+                                  alt={user.activeHat.hatName}
+                                  width="100"
+                                  className="hat-image"
+                                />
+                              </div>
+                            )}
+
+                            {/* แสดงเสื้อผ้าที่ active */}
+                            {user.activeCloth && (
+                              <div>
+                                <img
+                                  src={`http://localhost:3001/img/Clothes/${user.activeCloth.clothImg}`}
+                                  alt={user.activeCloth.clothName}
+                                  width="100"
+                                  className="cloth-image "
+                                />
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* แสดงสัตว์เลี้ยงที่ active */}
+                      <div className="col content-end">
+                        
+                        {user.petSelect && (
+                          <div
+                            className={`w-16 position-absolute start-48 `} // ใช้ className เฉพาะในหน้า Home
+                            style={{ transform: "translate( 0%, -80%)" }}
+                          >
+                            <img
+                              src={`http://localhost:3001/img/Pets/${user.petSelect.petImg}`}
+                              alt="Active Pet"
+                              className="pet-image "
+                            />
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
                 </li>
               ))}
             </ul>
@@ -198,7 +252,7 @@ export default function ChatRoom() {
                               <div
                                 key={index}
                                 className={`flex ${
-                                  msg.sender === displayName
+                                  msg.sender === userName
                                     ? "justify-end"
                                     : "justify-start"
                                 } mb-2`}
@@ -207,19 +261,19 @@ export default function ChatRoom() {
                                   <div>
                                     <small
                                       className={`text-xs text-gray-600 ${
-                                        msg.sender === displayName
+                                        msg.sender === userName
                                           ? "float-right"
                                           : "float-left"
                                       }`}
                                     >
-                                      {msg.sender === displayName
+                                      {msg.sender === userName
                                         ? "You"
                                         : msg.sender}
                                     </small>
                                   </div>
                                   <div
                                     className={`${
-                                      msg.sender === displayName
+                                      msg.sender === userName
                                         ? "bg-blue-500 text-white"
                                         : "bg-gray-300 text-black"
                                     } p-2 rounded-lg max-w-xs break-words clear-both`}
@@ -257,7 +311,7 @@ export default function ChatRoom() {
                     </div>
                   </div>
                 ) : (
-                  <h4> เลือกห้องแชทเพื่อเริ่มพูดคุยสิ !!! </h4>
+                  <h4>เลือกห้องแชทเพื่อเริ่มพูดคุยสิ !!!</h4>
                 )}
               </div>
             </div>

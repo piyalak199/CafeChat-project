@@ -7,7 +7,7 @@ const bodyParser = require("body-parser");
 
 const User = require("./libs/User");
 const ChatRoom = require("./libs/ChatRoom");
-const Coin = require("./libs/Coin")
+const Coin = require("./libs/Coin");
 
 const cors = require("cors");
 const express = require("express");
@@ -32,84 +32,7 @@ const server = app.listen(port, () => {
   console.log(`Server running at ${port}`);
 });
 
-  // const { Server } = require("socket.io");
-  // const io = new Server(server, {
-  //   cors: {
-  //     origin: "http://localhost:3000",
-  //     methods: ["GET", "POST"],
-  //   },
-  // });
-
-  // const roomUsers = {}; // เก็บรายชื่อผู้ใช้ในแต่ละห้อง
-  // const userRooms = {}; // เก็บห้องที่ผู้ใช้แต่ละคนอยู่
-
-  // io.on("connection", (socket) => {
-  //   console.log("A user connected:", socket.id);
-
-  //   // Join a specific chat room
-  //   socket.on("joinRoom", ({ roomID, displayName, userID }) => {
-  //     socket.join(roomID);
-  //     userRooms[socket.id] = { roomID, displayName, userID }; // Save userID
-
-  //     if (!roomUsers[roomID]) {
-  //       roomUsers[roomID] = [];
-  //     }
-  //     roomUsers[roomID].push(displayName);
-
-  //     io.to(roomID).emit("updateUsersInRoom", roomUsers[roomID]);
-  //     console.log(`${displayName} (ID: ${userID}) joined room ${roomID}`);
-  //   });
-
-  
-
-  //   // Leave a specific chat room
-  //   socket.on("leaveRoom", ({ roomID, displayName, userID }) => {
-  //     socket.leave(roomID);
-  //     if (roomUsers[roomID]) {
-  //       roomUsers[roomID] = roomUsers[roomID].filter((user) => user !== displayName);
-  //       if (roomUsers[roomID].length === 0) {
-  //         delete roomUsers[roomID];
-  //       }
-  //     }
-
-  //     io.to(roomID).emit("updateUsersInRoom", roomUsers[roomID]);
-  //     console.log(`${displayName} (ID: ${userID}) left room ${roomID}`);
-  //   });
-
-  //   // Handle disconnect event
-  //   socket.on("disconnect", () => {
-  //     console.log("A user disconnected:", socket.id);
-
-  //     const userRoom = userRooms[socket.id];
-  //     if (userRoom) {
-  //       const { roomID, displayName, userID } = userRoom;
-
-  //       socket.leave(roomID);
-  //       if (roomUsers[roomID]) {
-  //         roomUsers[roomID] = roomUsers[roomID].filter((user) => user !== displayName);
-  //         if (roomUsers[roomID].length === 0) {
-  //           delete roomUsers[roomID];
-  //         }
-  //       }
-
-  //       io.to(roomID).emit("updateUsersInRoom", roomUsers[roomID]);
-  //       console.log(`${displayName} (ID: ${userID}) disconnected and left room ${roomID}`);
-  //     }
-
-  //     delete userRooms[socket.id];
-  //   });
-
-  //   // Handle incoming messages
-  //   socket.on("sendMessage", (message) => {
-  //     io.to(message.room).emit("message", {
-  //       sender: message.sender,
-  //       text: message.text,
-  //     });
-  //   });
-  // });
-
-
-  const { Server } = require("socket.io");
+const { Server } = require("socket.io");
 const io = new Server(server, {
   cors: {
     origin: "http://localhost:3000",
@@ -120,34 +43,136 @@ const io = new Server(server, {
 const roomUsers = {}; // Store user info (displayName, userID) in each room
 const userRooms = {}; // Store the room each user is in, along with their displayName and userID
 
+const getPetSelect = (userID, callback) => {
+  const sql = `
+SELECT
+      u.petTypeID,
+      p.petName,
+      p.petImg
+    FROM
+      user u
+    JOIN pettype p ON
+      u.petTypeID = p.petTypeID 
+    WHERE
+      u.userID = ?
+  `;
+
+  pool.query(sql, [userID], (error, results) => {
+    if (error) {
+      console.log("Error fetching active pet:", error.message);
+      callback(null); // Return null if there's an error
+    } else {
+      callback(results.length > 0 ? results[0] : null); // Return the active hat or null if none
+    }
+  });
+};
+
+// Function to fetch the active hat directly from the database
+const getActiveHat = (userID, callback) => {
+  const sql = `
+    SELECT
+      h.hatID,
+      h.hatName,
+      h.hatImg
+    FROM
+      hat h
+    JOIN user_hat uh ON
+      uh.hatID = h.hatID
+    WHERE
+      uh.hat_active = "y" AND uh.userID = ?
+  `;
+
+  pool.query(sql, [userID], (error, results) => {
+    if (error) {
+      console.log("Error fetching active hat:", error.message);
+      callback(null); // Return null if there's an error
+    } else {
+      callback(results.length > 0 ? results[0] : null); // Return the active hat or null if none
+    }
+  });
+};
+// Function to fetch the active cloth directly from the database
+const getActiveCloth = (userID, callback) => {
+  const sql = `
+   SELECT
+      h.clothID,
+      h.clothName,
+      h.clothImg
+    FROM
+      cloth h
+    JOIN user_cloth uh ON
+      uh.clothID = h.clothID
+    WHERE
+      uh.cloth_active = "y" AND uh.userID = ?
+  `;
+
+  pool.query(sql, [userID], (error, results) => {
+    if (error) {
+      console.log("Error fetching active cloth:", error.message);
+      callback(null); // Return null if there's an error
+    } else {
+      callback(results.length > 0 ? results[0] : null); // Return the active cloth or null if none
+    }
+  });
+};
+
 io.on("connection", (socket) => {
   console.log("A user connected:", socket.id);
 
   // Join a specific chat room
-  socket.on("joinRoom", ({ roomID, displayName, userID, active_hat, active_cloth }) => {
+  socket.on("joinRoom", ({ roomID, displayName, userID }) => {
     socket.join(roomID);
-    userRooms[socket.id] = { roomID, displayName, userID, active_hat, active_cloth }; // Save userID and roomID for the connected socket
+    userRooms[socket.id] = {
+      roomID,
+      displayName,
+      userID,
+    }; // Save userID and roomID for the connected socket
 
     if (!roomUsers[roomID]) {
       roomUsers[roomID] = [];
     }
-    
-    // Push an object that includes both displayName and userID
-    roomUsers[roomID].push({ displayName, userID, active_hat, active_cloth });
 
-    // Emit the updated list of users in the room, including both displayName and userID
-    io.to(roomID).emit("updateUsersInRoom", roomUsers[roomID]);
-    console.log(`${displayName} (ID: ${userID}) joined room ${roomID}(hat: ${active_hat}) (cloth: ${active_cloth})`);
+    // Fetch the active hat and active cloth for this user directly from the database
+    getActiveHat(userID, (activeHat) => {
+      console.log(`Active hat for ${displayName} (ID: ${userID}):`, activeHat);
+
+      // Fetch the active cloth for the user
+      getActiveCloth(userID, (activeCloth) => {
+        console.log(
+          `Active cloth for ${displayName} (ID: ${userID}):`,
+          activeCloth
+        );
+        getPetSelect(userID, (petSelect) => {
+          console.log(
+            `Selected pet for ${displayName} (ID: ${userID}):`,
+            petSelect
+          );
+
+          // Push an object that includes both displayName, userID, activeHat, and activeCloth
+          roomUsers[roomID].push({
+            displayName,
+            userID,
+            activeHat,
+            activeCloth,
+            petSelect,
+          });
+
+          // Emit the updated list of users in the room, including displayName, userID, activeHat, and activeCloth
+          io.to(roomID).emit("updateUsersInRoom", roomUsers[roomID]);
+          console.log(`${displayName} (ID: ${userID}) joined room ${roomID}`);
+        });
+      });
+    });
   });
 
   // Leave a specific chat room
-  socket.on("leaveRoom", ({ roomID, displayName, userID, active_hat, active_cloth }) => {
+  socket.on("leaveRoom", ({ roomID, displayName, userID }) => {
     socket.leave(roomID);
 
     if (roomUsers[roomID]) {
       // Filter out the user who left by matching both displayName and userID
       roomUsers[roomID] = roomUsers[roomID].filter(
-        (user) => user.displayName !== displayName || user.userID !== userID || user.active_hat !== active_hat || user.active_cloth !== active_cloth
+        (user) => user.displayName !== displayName || user.userID !== userID
       );
 
       if (roomUsers[roomID].length === 0) {
@@ -165,13 +190,13 @@ io.on("connection", (socket) => {
 
     const userRoom = userRooms[socket.id];
     if (userRoom) {
-      const { roomID, displayName, userID, active_hat, active_cloth } = userRoom;
+      const { roomID, displayName, userID } = userRoom;
 
       socket.leave(roomID);
       if (roomUsers[roomID]) {
         // Filter out the user who disconnected
         roomUsers[roomID] = roomUsers[roomID].filter(
-          (user) => user.displayName !== displayName || user.userID !== userID || user.active_hat !== active_hat || user.active_cloth !== active_cloth
+          (user) => user.displayName !== displayName || user.userID !== userID
         );
 
         if (roomUsers[roomID].length === 0) {
@@ -180,8 +205,9 @@ io.on("connection", (socket) => {
       }
 
       io.to(roomID).emit("updateUsersInRoom", roomUsers[roomID]);
-      console.log(`${displayName} (ID: ${userID}) disconnected and left room ${roomID}`);
-      // console.log(`(hat: ${active_hat}) (cloth: ${active_cloth})`);
+      console.log(
+        `${displayName} (ID: ${userID}) disconnected and left room ${roomID}`
+      );
     }
 
     delete userRooms[socket.id];
@@ -291,7 +317,7 @@ app.post("/api/access_request", (req, res) => {
 
   if (decoded) {
     const query =
-      "SELECT a.userID, a.username, a.displayName, a.coin ,a.petTypeID, p.petName, p.petImg, r.roleID, r.roleName, a.active_hat, a.active_cloth " +
+      "SELECT a.userID, a.username, a.displayName, a.coin ,a.petTypeID, p.petName, p.petImg, r.roleID, r.roleName " +
       "FROM user a " +
       "INNER JOIN pettype p ON (a.petTypeID = p.petTypeID) " +
       "INNER JOIN roles r ON (a.roleID = r.roleID) " +
@@ -313,8 +339,6 @@ app.post("/api/access_request", (req, res) => {
             coin: results[0].coin,
             petTypeID: results[0].petTypeID,
             roleID: results[0].roleID,
-            active_hat: results[0].active_hat,
-            active_cloth: results[0].active_cloth
           };
           const accessToken = jwt.sign(payload, "MySecretKey");
           response = {
@@ -743,7 +767,8 @@ app.get("/api/userHats/:userID", async (req, res) => {
 // ฟังก์ชัน get Hat Detail UserID
 app.get("/api/hatdetailuser/:userID", async (req, res) => {
   const userID = req.params.userID;
-  const sql = "SELECT h.hatID, h.hatName, h.hatImg, h.hatCoin, uh.hat_active FROM hat h JOIN user_hat uh ON uh.hatID = h.hatID ";
+  const sql =
+    "SELECT h.hatID, h.hatName, h.hatImg, h.hatCoin, uh.hat_active FROM hat h JOIN user_hat uh ON uh.hatID = h.hatID ";
 
   if (userID == 0) {
     pool.query(sql, (error, results) => {
@@ -779,7 +804,8 @@ app.get("/api/hatdetailuser/:userID", async (req, res) => {
 // ฟังก์ชัน get Cloth Detail UserID
 app.get("/api/clothdetailuser/:userID", async (req, res) => {
   const userID = req.params.userID;
-  const sql = "SELECT h.clothID, h.clothName, h.clothImg, h.clothCoin, uh.cloth_active FROM cloth h JOIN user_cloth uh ON uh.clothID = h.clothID ";
+  const sql =
+    "SELECT h.clothID, h.clothName, h.clothImg, h.clothCoin, uh.cloth_active FROM cloth h JOIN user_cloth uh ON uh.clothID = h.clothID ";
 
   if (userID == 0) {
     pool.query(sql, (error, results) => {
@@ -824,9 +850,11 @@ app.post("/api/updateHatStatus", async (req, res) => {
   }
 
   // SQL statement สำหรับรีเซ็ต hat_active ทั้งหมดเป็น 'n'
-  const resetHatStatusSQL = "UPDATE user_hat SET hat_active = 'n' WHERE userID = ?";
+  const resetHatStatusSQL =
+    "UPDATE user_hat SET hat_active = 'n' WHERE userID = ?";
   // SQL statement สำหรับอัปเดต hat_active ของหมวกที่เลือกให้เป็น 'y'
-  const updateHatStatusSQL = "UPDATE user_hat SET hat_active = 'y' WHERE userID = ? AND hatID = ?";
+  const updateHatStatusSQL =
+    "UPDATE user_hat SET hat_active = 'y' WHERE userID = ? AND hatID = ?";
 
   try {
     // 1. รีเซ็ตหมวกทั้งหมดของ userID นั้นเป็น 'n'
@@ -839,19 +867,23 @@ app.post("/api/updateHatStatus", async (req, res) => {
       }
 
       // 2. อัปเดตหมวกที่เลือกให้เป็น 'y'
-      pool.query(updateHatStatusSQL, [userID, hatID], (updateError, updateResults) => {
-        if (updateError) {
-          return res.json({
-            result: false,
-            message: updateError.message,
+      pool.query(
+        updateHatStatusSQL,
+        [userID, hatID],
+        (updateError, updateResults) => {
+          if (updateError) {
+            return res.json({
+              result: false,
+              message: updateError.message,
+            });
+          }
+
+          res.json({
+            result: true,
+            message: "Hat status updated successfully",
           });
         }
-
-        res.json({
-          result: true,
-          message: "Hat status updated successfully",
-        });
-      });
+      );
     });
   } catch (error) {
     res.status(500).json({
@@ -873,9 +905,11 @@ app.post("/api/updateClothStatus", async (req, res) => {
   }
 
   // SQL statement สำหรับรีเซ็ต cloth_active ทั้งหมดเป็น 'n'
-  const resetClothStatusSQL = "UPDATE user_cloth SET cloth_active = 'n' WHERE userID = ?";
+  const resetClothStatusSQL =
+    "UPDATE user_cloth SET cloth_active = 'n' WHERE userID = ?";
   // SQL statement สำหรับอัปเดต cloth_active ของหมวกที่เลือกให้เป็น 'y'
-  const updateClothStatusSQL = "UPDATE user_cloth SET cloth_active = 'y' WHERE userID = ? AND clothID = ?";
+  const updateClothStatusSQL =
+    "UPDATE user_cloth SET cloth_active = 'y' WHERE userID = ? AND clothID = ?";
 
   try {
     // 1. รีเซ็ตหมวกทั้งหมดของ userID นั้นเป็น 'n'
@@ -888,19 +922,23 @@ app.post("/api/updateClothStatus", async (req, res) => {
       }
 
       // 2. อัปเดตหมวกที่เลือกให้เป็น 'y'
-      pool.query(updateClothStatusSQL, [userID, clothID], (updateError, updateResults) => {
-        if (updateError) {
-          return res.json({
-            result: false,
-            message: updateError.message,
+      pool.query(
+        updateClothStatusSQL,
+        [userID, clothID],
+        (updateError, updateResults) => {
+          if (updateError) {
+            return res.json({
+              result: false,
+              message: updateError.message,
+            });
+          }
+
+          res.json({
+            result: true,
+            message: "cloth status updated successfully",
           });
         }
-
-        res.json({
-          result: true,
-          message: "cloth status updated successfully",
-        });
-      });
+      );
     });
   } catch (error) {
     res.status(500).json({
@@ -909,7 +947,6 @@ app.post("/api/updateClothStatus", async (req, res) => {
     });
   }
 });
-
 
 // ฟังก์ชัน Type Coin / coinID
 app.get("/api/typecoin/:coinID", async (req, res) => {
@@ -961,15 +998,14 @@ app.post("/api/updateAddCoin", async (req, res) => {
   }
 });
 
-// // ฟังก์ชันเพื่อดึงข้อมูลหมวกที่ active ของผู้ใช้ทั้งหมด
-// app.get("/api/active-hats", async (req, res) => {
+// app.get("/api/active-hats/:userID", async (req, res) => {
+//   const userID = req.params.userID; // Get the userID from route parameters
+
 //   const sql = `
 //     SELECT
 //       h.hatID,
 //       h.hatName,
-//       h.hatImg,
-//       uh.hat_active,
-//       uh.userID
+//       h.hatImg
 //     FROM
 //       hat h
 //     JOIN user_hat uh ON
@@ -977,119 +1013,124 @@ app.post("/api/updateAddCoin", async (req, res) => {
 //     WHERE
 //       uh.hat_active = "y"
 //   `;
-  
-//   pool.query(sql, (error, results) => {
-//     if (error) {
-//       return res.json({
-//         result: false,
-//         message: error.message,
-//       });
-//     }
-//     return res.json({
-//       result: true,
-//       data: results,
+
+//   if (userID == 0) {
+//     pool.query(sql, (error, results) => {
+//       if (error) {
+//         res.json({
+//           result: false,
+//           message: error.message,
+//         });
+//       } else {
+//         res.json({
+//           result: true,
+//           data: results,
+//         });
+//       }
 //     });
-//   });
+//   } else {
+//     pool.query(sql + "AND uh.userID = ?", [userID], (error, results) => {
+//       if (error) {
+//         res.json({
+//           result: false,
+//           message: error.message,
+//         });
+//       } else {
+//         res.json({
+//           result: true,
+//           data: results.length > 0 ? results[0] : null, // Return the active hat or null if not found
+//         });
+//       }
+//     });
+//   }
 // });
 
-app.get("/api/active-hats", async (req, res) => {
-  const { userID } = req.query; // Get the userID from query parameters
+// app.get("/api/active-clothes/:userID", async (req, res) => {
+//   const userID = req.params.userID; // Get the userID from route parameters
 
-  if (!userID) {
-    return res.json({
-      result: false,
-      message: "Missing userID",
-    });
-  }
+//   const sql = `
+//     SELECT
+//       h.clothID,
+//       h.clothName,
+//       h.clothImg
+//     FROM
+//       cloth h
+//     JOIN user_cloth uh ON
+//       uh.clothID = h.clothID
+//     WHERE
+//       uh.cloth_active = "y"
+//   `;
 
-  const sql = `
-    SELECT
-      h.hatID,
-      h.hatName,
-      h.hatImg,
-      uh.hat_active,
-      uh.userID
-    FROM
-      hat h
-    JOIN user_hat uh ON
-      uh.hatID = h.hatID
-    WHERE
-      uh.hat_active = "y"
-      AND uh.userID = ?
-  `;
-  
-  pool.query(sql, [userID], (error, results) => {
-    if (error) {
-      return res.json({
-        result: false,
-        message: error.message,
-      });
-    }
-    return res.json({
-      result: true,
-      data: results.length > 0 ? results[0] : null, // Return the active hat or null if not found
-    });
-  });
-});
+//   if (userID == 0) {
+//     pool.query(sql, (error, results) => {
+//       if (error) {
+//         return res.json({
+//           result: false,
+//           message: error.message,
+//         });
+//       }
+//       return res.json({
+//         result: true,
+//         data: results,
+//       });
+//     });
+//   } else {
+//     pool.query(sql + "AND uh.userID = ?", [userID], (error, results) => {
+//       if (error) {
+//         return res.json({
+//           result: false,
+//           message: error.message,
+//         });
+//       }
+//       return res.json({
+//         result: true,
+//         data: results,
+//       });
+//     });
+//   }
+// });
 
+// // // ฟังก์ชันเพื่อดึงข้อมูลผู้ใช้พร้อมกับข้อมูลประเภทสัตว์เลี้ยง
+// app.get("/api/user-pets/:userID", async (req, res) => {
+//   const userID = req.params.userID; // Get the userID from route parameters
+//   const sql = `
+//     SELECT
+//       u.petTypeID,
+//       p.petName,
+//       p.petImg
+//     FROM
+//       user u
+//     JOIN pettype p ON
+//       u.petTypeID = p.petTypeID
+//     WHERE
+//       u.userID = ?
+//   `;
 
-// ฟังก์ชันเพื่อดึงข้อมูลเสื้อผ้าที่ active ของผู้ใช้ทั้งหมด
-app.get("/api/active-clothes", async (req, res) => {
-  const sql = `
-    SELECT
-      h.clothID,
-      h.clothName,
-      h.clothImg,
-      uh.cloth_active,
-      uh.userID
-    FROM
-      cloth h
-    JOIN user_cloth uh ON
-      uh.clothID = h.clothID
-    WHERE
-      uh.cloth_active = "y"
-  `;
-
-  pool.query(sql, (error, results) => {
-    if (error) {
-      return res.json({
-        result: false,
-        message: error.message,
-      });
-    }
-    return res.json({
-      result: true,
-      data: results,
-    });
-  });
-});
-
-// ฟังก์ชันเพื่อดึงข้อมูลผู้ใช้พร้อมกับข้อมูลประเภทสัตว์เลี้ยง
-app.get("/api/user-pets", async (req, res) => {
-  const sql = `
-    SELECT
-      u.userID,
-      u.petTypeID,
-      p.petName,
-      p.petImg
-    FROM
-      user u
-    JOIN pettype p ON 
-      u.petTypeID = p.petTypeID
-  `;
-  
-  pool.query(sql, (error, results) => {
-    if (error) {
-      return res.json({
-        result: false,
-        message: error.message,
-      });
-    }
-    return res.json({
-      result: true,
-      data: results,
-    });
-  });
-});
-
-
+//   if (userID == 0) {
+//     pool.query(sql, (error, results) => {
+//       if (error) {
+//         return res.json({
+//           result: false,
+//           message: error.message,
+//         });
+//       }
+//       return res.json({
+//         result: true,
+//         data: results,
+//       });
+//     });
+//   } else {
+//     pool.query(sql + "AND u.userID = ?", [userID], (error, results) => {
+//       if (error) {
+//         return res.json({
+//           result: false,
+//           message: error.message,
+//         });
+//       }
+//       return res.json({
+//         result: true,
+//         data: results,
+//       });
+//     });
+//   }
+// });
