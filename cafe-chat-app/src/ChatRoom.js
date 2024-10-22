@@ -29,7 +29,6 @@ export default function ChatRoom() {
 
   const [messageInput, setMessageInput] = useState("");
 
-
   const scrollToBottom = () => {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
@@ -71,7 +70,6 @@ export default function ChatRoom() {
       displayName: userName,
       userID: userID,
     });
-
 
     // Listen for join error
     newSocket.on("roomFull", (data) => {
@@ -160,7 +158,15 @@ export default function ChatRoom() {
             <ul className="list-inline">
               {usersInRoom.map((user, index) => (
                 <li key={index} className="list-inline-item p-0 px-4">
-                  {user.displayName} {/* (ID: {user.userID}) */}
+                  <div
+                    style={{
+                      position: "absolute",
+                      transform: "translate(170px, 500%)",
+                    }}
+                  >
+                    {user.displayName}
+                  </div>
+
                   <div className={`container`}>
                     <div className="row justify-content-md-center">
                       <div className="col col-lg-2">
@@ -224,8 +230,8 @@ export default function ChatRoom() {
                       <div className="col content-end">
                         {user.petSelect && (
                           <div
-                            className={`w-16 position-absolute start-48 `} // ใช้ className เฉพาะในหน้า Home
-                            style={{ transform: "translate( 0%, -80%)" }}
+                            // className={` custom-home-avatar-class`} // ใช้ className เฉพาะในหน้า Home
+                            style={{ transform: "translate( -60%, -80%)" }}
                           >
                             <img
                               src={`http://localhost:3001/img/Pets/${user.petSelect.petImg}`}
@@ -235,7 +241,7 @@ export default function ChatRoom() {
                                 position: "absolute",
                                 top: "49%", // เลื่อนขึ้นลง
                                 left: "calc(50% + 100px)",
-                                transform: "translate(-50%, +33%)",
+                                transform: "translate(-80%, -8%)",
                                 zIndex: 0,
                               }}
                             />

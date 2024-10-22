@@ -38,12 +38,13 @@ function AddCoin() {
 
       const data = await res.json();
       console.log("SlipOk data: ", data);
+      setIsSlipSubmitted(true); // Mark that the slip has been submitted
 
       if (res.ok) {
         console.log("Request successfully");
         setSlipokData(data.data);
 
-        setIsSlipSubmitted(true); // Mark that the slip has been submitted
+        
 
         if (data.data.success) {
           // If slip is valid, check the amount
@@ -180,9 +181,9 @@ function AddCoin() {
                       <div>
                         <p>จำนวนเงินที่คุณโอน: {slipokData?.amount}</p>
                         {slipokData?.success === true ? (
-                          <p>สลิปถูกต้อง</p>
+                          <p className="">สลิปถูกต้อง</p>
                         ) : (
-                          <p>สลิปไม่ถูกต้อง !!</p>
+                          <p className="text-red-800">สลิปไม่ถูกต้อง !!</p>
                         )}
                       </div>
                     )}
